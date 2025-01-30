@@ -51,6 +51,10 @@ class CreateDataset(Dataset):
         # return 2 images + label        
         return img0, img1, torch.tensor([int(img1_tuple[1] != img0_tuple[1])], dtype=torch.float32)
 
+# load datasets
+training_dataset = CreateDataset(datasets.ImageFolder(root="./dataset/training/"))
+test_dataset = CreateDataset(datasets.ImageFolder(root="./dataset/test/"))
+
 # Model Class
 class SiameseNeuralNetwork(nn.module):
     def __init__(self):

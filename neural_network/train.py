@@ -52,8 +52,12 @@ class CreateDataset(Dataset):
         return img0, img1, torch.tensor([int(img1_tuple[1] != img0_tuple[1])], dtype=torch.float32)
 
 # load datasets
-training_dataset = CreateDataset(datasets.ImageFolder(root="./dataset/training/"))
+train_dataset = CreateDataset(datasets.ImageFolder(root="./dataset/train/"))
 test_dataset = CreateDataset(datasets.ImageFolder(root="./dataset/test/"))
+
+# create dataloaders
+train_dataloader = DataLoader(train_dataset, shuffle=True, num_workers=0, batch_size=10)
+test_dataloader = DataLoader(test_dataset, shuffle=False, num_workers=0, batch_size=10)
 
 # Model Class
 class SiameseNeuralNetwork(nn.module):

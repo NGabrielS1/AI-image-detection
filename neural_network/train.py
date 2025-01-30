@@ -1,15 +1,15 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import random
+from PIL import Image
+
+from torchvision.utils import make_grid
+from torchvision import datasets, transforms
+from torch.utils.data import DataLoader, Dataset
+import torchvision.utils
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.utils.data import DataLoader
-from torchvision import datasets, transforms
-from torchvision.utils import make_grid
-
-import numpy as np
-import pandas as pd
-from sklearn.metrics import confusion_matrix
-import matplotlib.pyplot as plt
-import time
 
 # Model Class
 class SiameseNeuralNetwork(nn.module):

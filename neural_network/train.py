@@ -47,7 +47,8 @@ class CreateDataset(Dataset):
 
         img0 = self.transform(img0)
         img1 = self.transform(img1)
-        
+
+        # return 2 images + label        
         return img0, img1, torch.tensor([int(img1_tuple[1] != img0_tuple[1])], dtype=torch.float32)
 
 # Model Class

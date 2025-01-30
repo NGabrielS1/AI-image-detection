@@ -22,7 +22,7 @@ class CreateDataset(Dataset):
         self.transform = transform
         
     def __getitem__(self,index):
-        img0_tuple = random.choice(self.imageFolderDataset.imgs)
+        img0_tuple = self.imageFolderDataset.imgs[index]
 
         #We need to approximately 50% of images to be in the same class
         should_get_same_class = random.randint(0,1) 

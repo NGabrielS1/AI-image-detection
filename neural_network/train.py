@@ -11,6 +11,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+# set random seed
+random.seed(41)
+torch.manual_seed(41)
+
 # Model Class
 class SiameseNeuralNetwork(nn.module):
     def __init__(self):
@@ -25,3 +29,19 @@ class SiameseNeuralNetwork(nn.module):
         y2 = self.resnet50(X2)
 
         return y1, y2
+
+# Define the Contrastive Loss Function
+class ContrastiveLoss(torch.nn.Module):
+    def __init__(self, margin=2.0):
+        super(ContrastiveLoss, self).__init__()
+        self.margin = margin
+
+    def forward(self, output1, output2, label):
+      # Calculate the euclidian distance and calculate the contrastive loss
+      euclidean_distance = F.pairwise_distance(output1, output2, keepdim = True)
+
+      loss_contrastive = torch.mean((1-label) * torch.pow(euclidean_distance, 2) +
+                                    (label) * torch.pow(torch.clamp(self.margin - euclidean_distance, min=0.0), 2))
+
+
+      return loss_contrastive

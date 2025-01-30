@@ -17,9 +17,13 @@ torch.manual_seed(41)
 
 # Function to create dataset and labels
 class CreateDataset(Dataset):
-    def __init__(self,imageFolderDataset,transform=None):
+    def __init__(self,imageFolderDataset):
         self.imageFolderDataset = imageFolderDataset    
-        self.transform = transform
+        self.transform = transforms.Compose([
+            transforms.Resize((256,256)),
+            transforms.Grayscale(num_output_channels=1),
+            transforms.ToTensor()
+        ])
         
     def __getitem__(self,index):
         img0_tuple = self.imageFolderDataset.imgs[index]
@@ -40,9 +44,6 @@ class CreateDataset(Dataset):
 
         img0 = Image.open(img0_tuple[0])
         img1 = Image.open(img1_tuple[0])
-
-        img0 = img0.convert("L")
-        img1 = img1.convert("L")
 
         img0 = self.transform(img0)
         img1 = self.transform(img1)

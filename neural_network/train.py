@@ -44,9 +44,8 @@ class CreateDataset(Dataset):
         img0 = img0.convert("L")
         img1 = img1.convert("L")
 
-        if self.transform is not None:
-            img0 = self.transform(img0)
-            img1 = self.transform(img1)
+        img0 = self.transform(img0)
+        img1 = self.transform(img1)
         
         return img0, img1, torch.from_numpy(np.array([int(img1_tuple[1] != img0_tuple[1])], dtype=np.float32))
 

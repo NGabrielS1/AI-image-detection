@@ -17,7 +17,7 @@ file = 0
 def get_images():
     global file, files
     file = 0
-    files = filedialog.askopenfiles(mode="r", filetypes=[("*.jpg"), ("*.jpeg",) ("*.png")])
+    files = filedialog.askopenfiles(mode="r", filetypes=[("Image File", "*.jpg"), ("Image File", "*.jpeg",) ("Image File", "*.png")])
     file_name.configure(text=f"{files[file].name}")
     file_counter_label.configure(text=f"Files: {len(files)}")
 

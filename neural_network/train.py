@@ -93,3 +93,22 @@ class ContrastiveLoss(torch.nn.Module):
 model = SiameseNetwork()
 criterion = ContrastiveLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr = 0.0005)
+
+# variables
+epochs = 5
+train_losses = []
+test_losses = []
+
+# Loop of Epochs
+for i in range(epochs):
+    # train
+    for b, (X1, X2, label) in enumerate(train_dataloader, 0):
+        # Zero the gradients
+        optimizer.zero_grad()
+        # Get results from model
+        y1, y2 = model(X1, X2)
+        # Pass results and label to loss function
+        loss = criterion(y1, y2, label)
+        # Calculate backpropagation and optimize
+        loss.backward()
+        optimizer.step()

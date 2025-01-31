@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 from PIL import Image
+import time
 
 from torchvision.utils import make_grid
 from torchvision import datasets, transforms
@@ -97,7 +98,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr = 0.0005)
 # variables
 epochs = 5
 train_losses = []
-test_losses = []
+start_time = time.time()
 
 # Loop of Epochs
 for i in range(epochs):
@@ -119,3 +120,13 @@ for i in range(epochs):
     
     # track loss each epoch
     train_losses.append(loss.item())
+
+# print time taken
+print(f"Training Took: {(time.time()-start_time)/60} minutes!")
+
+# Graph the loss at each epoch
+train_losses = [tl for tl in train_losses]
+plt.plot(train_losses, label="Training Losses")
+plt.title("Loss at Epoch")
+plt.show()
+

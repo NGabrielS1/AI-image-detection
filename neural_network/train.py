@@ -60,7 +60,7 @@ train_dataloader = DataLoader(train_dataset, shuffle=True, num_workers=0, batch_
 test_dataloader = DataLoader(test_dataset, shuffle=False, num_workers=0, batch_size=10)
 
 # Model Class
-class SiameseNeuralNetwork(nn.module):
+class SiameseNetwork(nn.module):
     def __init__(self):
         super().__init__()
         # load ResNet50 (transfer learning)
@@ -68,6 +68,7 @@ class SiameseNeuralNetwork(nn.module):
         # change input and output
         self.resnet50.conv1 = nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
         self.resnet50.fc = nn.Linear(in_features=2048, out_features=2, bias=True)
+
     def forward(self, X1, X2):
         y1 = self.resnet50(X1)
         y2 = self.resnet50(X2)
@@ -87,3 +88,8 @@ class ContrastiveLoss(torch.nn.Module):
       loss_contrastive = torch.mean((1-label) * torch.pow(euclidean_distance, 2) + (label) * torch.pow(torch.clamp(self.margin - euclidean_distance, min=0.0), 2))
 
       return loss_contrastive
+
+# create a instance of model, choose loss function and optimizer
+model = SiameseNetwork()
+criterion = ContrastiveLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr = 0.0005 )

@@ -113,7 +113,7 @@ for i in range(epochs):
         # Calculate backpropagation and optimize
         loss.backward()
         optimizer.step()
-        
+
         # print loss
         if b % 100 == 0:
             print(f"Epoch: {i}, Batch: {b}, Loss: {loss.item()}")
@@ -130,3 +130,5 @@ plt.plot(train_losses, label="Training Losses")
 plt.title("Loss at Epoch")
 plt.show()
 
+# save our NN model
+torch.save(model.state_dict(), "codemy_intro/AI_DETECTOR_SIAMESE.pt")

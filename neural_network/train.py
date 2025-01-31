@@ -60,6 +60,15 @@ test_dataset = CreateDataset(datasets.ImageFolder(root="./dataset/test/"))
 train_dataloader = DataLoader(train_dataset, shuffle=True, num_workers=0, batch_size=10)
 test_dataloader = DataLoader(test_dataset, shuffle=False, num_workers=0, batch_size=10)
 
+# see 1 batch
+example_batch = next(iter(train_dataloader))
+concatenated = make_grid(torch.cat((example_batch[0], example_batch[1]),0)).numpy()
+print(example_batch[2].reshape(-1))
+plt.imshow(np.transpose(concatenated, (1, 2, 0)))
+plt.show()
+
+
+
 # Model Class
 class SiameseNetwork(nn.module):
     def __init__(self):
@@ -103,7 +112,7 @@ start_time = time.time()
 # Loop of Epochs
 for i in range(epochs):
     # train
-    for b, (X1, X2, label) in enumerate(train_dataloader, 0):
+    for b, (X1, X2, label) in enumerate(train_dataloader):
         # Zero the gradients
         optimizer.zero_grad()
         # Get results from model

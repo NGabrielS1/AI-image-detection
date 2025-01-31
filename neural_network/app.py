@@ -26,7 +26,7 @@ def next_file():
     if file < len(files)-1:
         file += 1
         file_name.configure(text=f"{files[file].name}")
-        ai_label.configure(text="...", text_color="green")
+        ai_label.configure(text="...", text_color="blue")
         file_counter_label.configure(text=f"Files: {len(files) - file}")
     else:
         files = []
@@ -61,7 +61,7 @@ file_counter_label.grid(row=2, column=0, columnspan=3, sticky="nw", padx = 10)
 file_name = ctk.CTkLabel(master=image_frame, text="No File")
 file_name.place(anchor="center", relx=0.5, rely=0.65)
 
-ai_label = ctk.CTkLabel(master=image_frame, text="...", text_color="green")
+ai_label = ctk.CTkLabel(master=image_frame, text="...", text_color="blue")
 ai_label.place(anchor="center", relx=0.5, rely=0.7)
 
 next_button = ctk.CTkButton(master=image_frame, text="Next", command=next_file)

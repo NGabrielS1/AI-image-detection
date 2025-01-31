@@ -26,6 +26,7 @@ def next_file():
     if file < len(files)-1:
         file += 1
         file_name.configure(text=f"{files[file].name}")
+        ai_label.configure(text="...", text_color="green")
         file_counter_label.configure(text=f"Files: {len(files) - file}")
     else:
         files = []
@@ -35,7 +36,7 @@ def next_file():
 
 
 # images
-upload_img = ctk.CTkImage(Image.open("upload-button.png").resize((1000,1000), Image.Resampling.LANCZOS))
+upload_img = ctk.CTkImage(Image.open("neural_network/upload-button.png").resize((1000,1000), Image.Resampling.LANCZOS))
 
 # frame
 side_frame = ctk.CTkFrame(master=app, corner_radius=0)

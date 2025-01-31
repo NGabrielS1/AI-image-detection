@@ -21,6 +21,7 @@ def get_images():
     print(files[0])
     file_name.configure(text=f"{files[file].name}")
     file_counter_label.configure(text=f"Files: {len(files)}")
+    process_image(files[file].name)
 
 def next_file():
     global file, files
@@ -29,15 +30,22 @@ def next_file():
         file_name.configure(text=f"{files[file].name}")
         ai_label.configure(text="...", text_color="blue")
         file_counter_label.configure(text=f"Files: {len(files) - file}")
+        process_image(files[file].name)
     else:
         files = []
         file = 0
         file_name.configure(text="No File")
         file_counter_label.configure(text=f"Files: {len(files)}")
 
+def process_image(file):
+    image = Image.open(file)
+    image.resize((256,256))
+    image_tk = ctk.CTkImage(image)
+    image_label.configure(image=image_tk)
+
 
 # images
-upload_img = ctk.CTkImage(Image.open("neural_network/upload-button.png").resize((1000,1000), Image.Resampling.LANCZOS))
+upload_img = ctk.CTkImage(Image.open("neural_network/upload-button.png"))
 
 # frame
 side_frame = ctk.CTkFrame(master=app, corner_radius=0)
@@ -59,14 +67,17 @@ file_counter_label = ctk.CTkLabel(master=side_frame, text="Files: 0")
 file_counter_label.grid(row=2, column=0, columnspan=3, sticky="nw", padx = 10)
 
 # image frame widgets
+image_label = ctk.CTkFrame(master=image_frame)
+image_label.place(anchor="center", relx=0.5, rely=0.3, relheight = 0.5, relwidth = 0.5)
+
 file_name = ctk.CTkLabel(master=image_frame, text="No File")
 file_name.place(anchor="center", relx=0.5, rely=0.65)
 
 ai_label = ctk.CTkLabel(master=image_frame, text="...", text_color="blue")
 ai_label.place(anchor="center", relx=0.5, rely=0.7)
 
-next_button = ctk.CTkButton(master=image_frame, text="Next", command=next_file)
-next_button.place(anchor="center", relx=0.5, rely=0.8, relwidth=0.2, relheight=0.1)
+next_btn = ctk.CTkButton(master=image_frame, text="Next", command=next_file)
+next_btn.place(anchor="center", relx=0.5, rely=0.8, relwidth=0.2, relheight=0.1)
 
 # on resize
 def resize(event):

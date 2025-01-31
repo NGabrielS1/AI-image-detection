@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from customtkinter import filedialog
 from PIL import Image
+import threading
 
 # Parent window
 app = ctk.CTk()
@@ -21,7 +22,7 @@ def get_images():
     print(files[0])
     file_name.configure(text=f"{files[file].name}")
     file_counter_label.configure(text=f"Files: {len(files)}")
-    process_image(files[file].name)
+    threading.Thread(target=process_image, args=(files[file].name,)).start()
 
 def next_file():
     global file, files
@@ -30,18 +31,18 @@ def next_file():
         file_name.configure(text=f"{files[file].name}")
         ai_label.configure(text="...", text_color="blue")
         file_counter_label.configure(text=f"Files: {len(files) - file}")
-        process_image(files[file].name)
+        threading.Thread(target=process_image, args=(files[file].name,)).start()
     else:
         files = []
         file = 0
         file_name.configure(text="No File")
         file_counter_label.configure(text=f"Files: {len(files)}")
+        image_label.configure(image=None)
 
 def process_image(file):
     image = Image.open(file)
     image.resize((256,256))
-    image_tk = ctk.CTkImage(image)
-    image_label.configure(image=image_tk)
+    image_label.configure(image=ctk.CTkImage(image,size=(image_label.winfo_width(),image_label.winfo_width())))
 
 
 # images
@@ -67,7 +68,7 @@ file_counter_label = ctk.CTkLabel(master=side_frame, text="Files: 0")
 file_counter_label.grid(row=2, column=0, columnspan=3, sticky="nw", padx = 10)
 
 # image frame widgets
-image_label = ctk.CTkFrame(master=image_frame)
+image_label = ctk.CTkLabel(master=image_frame, text="")
 image_label.place(anchor="center", relx=0.5, rely=0.3, relheight = 0.5, relwidth = 0.5)
 
 file_name = ctk.CTkLabel(master=image_frame, text="No File")

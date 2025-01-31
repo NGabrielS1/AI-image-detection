@@ -113,7 +113,7 @@ for i in range(epochs):
         # Calculate backpropagation and optimize
         loss.backward()
         optimizer.step()
-
+        
         # print loss
         if b % 100 == 0:
             print(f"Epoch: {i}, Batch: {b}, Loss: {loss.item()}")

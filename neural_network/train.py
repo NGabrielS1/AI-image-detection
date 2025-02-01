@@ -104,7 +104,7 @@ class ContrastiveLoss(torch.nn.Module):
 # create a instance of model, choose loss function and optimizer
 model = SiameseNetwork()
 criterion = ContrastiveLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr = 0.0005)
+optimizer = torch.optim.Adam(model.parameters(), lr = 0.01)
 
 # variables
 epochs = 5

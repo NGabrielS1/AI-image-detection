@@ -60,7 +60,7 @@ class CreateDataset(Dataset):
 train_dataset = CreateDataset(datasets.ImageFolder(root="./data/train/"))
 
 # create dataloaders
-train_dataloader = DataLoader(train_dataset, shuffle=True, num_workers=0, batch_size=10)
+train_dataloader = DataLoader(train_dataset, shuffle=True, num_workers=4, batch_size=10)
 
 # see 1 batch
 example_batch = next(iter(train_dataloader))
@@ -104,7 +104,7 @@ class ContrastiveLoss(torch.nn.Module):
 # create a instance of model, choose loss function and optimizer
 model = SiameseNetwork()
 criterion = ContrastiveLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr = 0.01)
+optimizer = torch.optim.Adam(model.parameters(), lr = 0.001)
 
 # variables
 epochs = 5

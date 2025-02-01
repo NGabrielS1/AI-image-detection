@@ -51,6 +51,10 @@ class CreateDataset(Dataset):
 
         # return 2 images + label        
         return img0, img1, torch.tensor([int(img1_tuple[1] != img0_tuple[1])], dtype=torch.float32)
+    
+    # len function
+    def __len__(self):
+        return len(self.imageFolderDataset.imgs)
 
 # load datasets
 train_dataset = CreateDataset(datasets.ImageFolder(root="./data/train/"))

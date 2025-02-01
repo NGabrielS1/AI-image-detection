@@ -71,7 +71,7 @@ file_counter_label.grid(row=2, column=0, columnspan=3, sticky="nw", padx = 10)
 image_label = ctk.CTkLabel(master=image_frame, text="")
 image_label.place(anchor="center", relx=0.5, rely=0.3, relheight = 0.5, relwidth = 0.5)
 
-file_name = ctk.CTkLabel(master=image_frame, text="No File")
+file_name = ctk.CTkLabel(master=image_frame, text="No File", font=("Arial", 20))
 file_name.place(anchor="center", relx=0.5, rely=0.65)
 
 ai_label = ctk.CTkLabel(master=image_frame, text="...", text_color="blue")
@@ -84,7 +84,6 @@ next_btn.place(anchor="center", relx=0.5, rely=0.8, relwidth=0.2, relheight=0.1)
 def resize(event):
     title_label.configure(font=("Arial", app.winfo_height() * 0.03))
     file_counter_label.configure(font=("Arial", app.winfo_height() * 0.03))
-    file_name.configure(font=("Arial", app.winfo_height() * 0.05))
     ai_label.configure(font=("Arial", app.winfo_height() * 0.05))
     upload_btn.grid(ipady=app.winfo_height() * 0.05)
 

@@ -89,8 +89,6 @@ class ContrastiveLoss(torch.nn.Module):
 
 # create dataloaders
 if __name__ == "__main__":
-    mp.set_start_method("spawn", force=True)
-
     # load datasets
     train_dataset = CreateDataset(datasets.ImageFolder(root="./data/train/"))
 

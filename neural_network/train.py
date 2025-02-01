@@ -72,7 +72,7 @@ plt.show()
 
 
 # Model Class
-class SiameseNetwork(nn.module):
+class SiameseNetwork(nn.Module):
     def __init__(self):
         super().__init__()
         # load ResNet50 (transfer learning)

@@ -54,11 +54,9 @@ class CreateDataset(Dataset):
 
 # load datasets
 train_dataset = CreateDataset(datasets.ImageFolder(root="./dataset/train/"))
-test_dataset = CreateDataset(datasets.ImageFolder(root="./dataset/test/"))
 
 # create dataloaders
 train_dataloader = DataLoader(train_dataset, shuffle=True, num_workers=0, batch_size=10)
-test_dataloader = DataLoader(test_dataset, shuffle=False, num_workers=0, batch_size=10)
 
 # see 1 batch
 example_batch = next(iter(train_dataloader))

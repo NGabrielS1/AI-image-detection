@@ -56,22 +56,6 @@ class CreateDataset(Dataset):
     def __len__(self):
         return len(self.imageFolderDataset.imgs)
 
-# load datasets
-train_dataset = CreateDataset(datasets.ImageFolder(root="./data/train/"))
-
-# create dataloaders
-if __name__ == "__main__":
-    train_dataloader = DataLoader(train_dataset, shuffle=True, num_workers=4, batch_size=10)
-
-# see 1 batch
-example_batch = next(iter(train_dataloader))
-concatenated = make_grid(torch.cat((example_batch[0], example_batch[1]),0)).numpy()
-print(example_batch[2].reshape(-1))
-plt.imshow(np.transpose(concatenated, (1, 2, 0)))
-plt.show()
-
-
-
 # Model Class
 class SiameseNetwork(nn.Module):
     def __init__(self):
@@ -102,45 +86,61 @@ class ContrastiveLoss(torch.nn.Module):
 
       return loss_contrastive
 
-# create a instance of model, choose loss function and optimizer
-model = SiameseNetwork()
-criterion = ContrastiveLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr = 0.001)
+# create dataloaders
+if __name__ == "__main__":
 
-# variables
-epochs = 5
-train_losses = []
-start_time = time.time()
+    # load datasets
+    train_dataset = CreateDataset(datasets.ImageFolder(root="./data/train/"))
 
-# Loop of Epochs
-for i in range(epochs):
-    # train
-    for b, (X1, X2, label) in enumerate(train_dataloader):
-        # Zero the gradients
-        optimizer.zero_grad()
-        # Get results from model
-        y1, y2 = model(X1, X2)
-        # Pass results and label to loss function
-        loss = criterion(y1, y2, label)
-        # Calculate backpropagation and optimize
-        loss.backward()
-        optimizer.step()
+    # create dataloaders
+    train_dataloader = DataLoader(train_dataset, shuffle=True, num_workers=4, batch_size=10)
 
-        # print loss
-        if b % 100 == 0:
-            print(f"Epoch: {i}, Batch: {b}, Loss: {loss.item()}")
-    
-    # track loss each epoch
-    train_losses.append(loss.item())
+    # see 1 batch
+    example_batch = next(iter(train_dataloader))
+    concatenated = make_grid(torch.cat((example_batch[0], example_batch[1]),0)).numpy()
+    print(example_batch[2].reshape(-1))
+    plt.imshow(np.transpose(concatenated, (1, 2, 0)))
+    plt.show()
 
-# print time taken
-print(f"Training Took: {(time.time()-start_time)/60} minutes!")
+    # create a instance of model, choose loss function and optimizer
+    model = SiameseNetwork()
+    criterion = ContrastiveLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr = 0.001)
 
-# Graph the loss at each epoch
-train_losses = [tl for tl in train_losses]
-plt.plot(train_losses, label="Training Losses")
-plt.title("Loss at Epoch")
-plt.show()
+    # variables
+    epochs = 5
+    train_losses = []
+    start_time = time.time()
 
-# save our NN model
-torch.save(model.state_dict(), "codemy_intro/AI_DETECTOR_SIAMESE.pt")
+    # Loop of Epochs
+    for i in range(epochs):
+        # train
+        for b, (X1, X2, label) in enumerate(train_dataloader):
+            # Zero the gradients
+            optimizer.zero_grad()
+            # Get results from model
+            y1, y2 = model(X1, X2)
+            # Pass results and label to loss function
+            loss = criterion(y1, y2, label)
+            # Calculate backpropagation and optimize
+            loss.backward()
+            optimizer.step()
+
+            # print loss
+            if b % 100 == 0:
+                print(f"Epoch: {i}, Batch: {b}, Loss: {loss.item()}")
+        
+        # track loss each epoch
+        train_losses.append(loss.item())
+
+    # print time taken
+    print(f"Training Took: {(time.time()-start_time)/60} minutes!")
+
+    # Graph the loss at each epoch
+    train_losses = [tl for tl in train_losses]
+    plt.plot(train_losses, label="Training Losses")
+    plt.title("Loss at Epoch")
+    plt.show()
+
+    # save our NN model
+    torch.save(model.state_dict(), "codemy_intro/AI_DETECTOR_SIAMESE.pt")

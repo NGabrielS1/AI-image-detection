@@ -53,7 +53,7 @@ class CreateDataset(Dataset):
         return img0, img1, torch.tensor([int(img1_tuple[1] != img0_tuple[1])], dtype=torch.float32)
 
 # load datasets
-train_dataset = CreateDataset(datasets.ImageFolder(root="./dataset/train/"))
+train_dataset = CreateDataset(datasets.ImageFolder(root="./data/train/"))
 
 # create dataloaders
 train_dataloader = DataLoader(train_dataset, shuffle=True, num_workers=0, batch_size=10)

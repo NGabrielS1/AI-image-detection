@@ -3,6 +3,7 @@ import numpy as np
 import random
 from PIL import Image
 import time
+import multiprocessing as mp
 
 from torchvision.utils import make_grid
 from torchvision import datasets, transforms
@@ -88,6 +89,7 @@ class ContrastiveLoss(torch.nn.Module):
 
 # create dataloaders
 if __name__ == "__main__":
+    mp.set_start_method("spawn", force=True)
 
     # load datasets
     train_dataset = CreateDataset(datasets.ImageFolder(root="./data/train/"))

@@ -115,10 +115,12 @@ if __name__ == "__main__":
         y1, y2 = model(X1, X2)
         # get prediction
         prediction = F.pairwise_distance(y1, y2)
+        print(f"prediction before: {prediction}")
         if prediction > 1.5:
           prediction = torch.FloatTensor([1])
         else:
           prediction = torch.FloatTensor([0])
+        print(f"prediction after: {prediction}")
         predictions.append(prediction)
         if prediction.item() == label.item():
           correct += 1

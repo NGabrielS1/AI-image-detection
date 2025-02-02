@@ -98,12 +98,15 @@ if __name__ == "__main__":
     # create dataloaders
     test_dataloader = DataLoader(test_dataset, shuffle=False, num_workers=4, batch_size=10)
 
+    # load saved model
+    model = SiameseNetwork()
+    model.load_state_dict(torch.load("AI_DETECTOR_SIAMESE.pt"))
+
     # variables
     correct = 0
     predictions = []
 
     # put model in eval mode
-    model.eval()
     with torch.no_grad():
       for b, (X1, X2, label) in enumerate(test_dataloader):
         # move to device

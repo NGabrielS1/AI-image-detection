@@ -93,7 +93,7 @@ if __name__ == "__main__":
     train_dataset = CreateDataset(datasets.ImageFolder(root="./data/train/"))
 
     # create dataloaders
-    train_dataloader = DataLoader(train_dataset, shuffle=True, num_workers=8, batch_size=10)
+    train_dataloader = DataLoader(train_dataset, shuffle=True, num_workers=8, batch_size=64)
 
     # see 1 batch
     example_batch = next(iter(train_dataloader))

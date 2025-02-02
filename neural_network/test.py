@@ -93,14 +93,14 @@ class ContrastiveLoss(torch.nn.Module):
 # testing
 if __name__ == "__main__":
     # load datasets
-    test_dataset = CreateDataset(datasets.ImageFolder(root="./AI-image-detection/data/test/"))
+    test_dataset = CreateDataset(datasets.ImageFolder(root="./data/test/"))
 
     # create dataloaders
     test_dataloader = DataLoader(test_dataset, shuffle=False, num_workers=4, batch_size=10)
 
     # load saved model
     model = SiameseNetwork()
-    model.load_state_dict(torch.load("AI_DETECTOR_SIAMESE.pt"))
+    model.load_state_dict(torch.load("AI_DETECTOR_SIAMESE.pt", map_location=torch.device('cpu')))
 
     # variables
     correct = 0
@@ -116,13 +116,13 @@ if __name__ == "__main__":
         # get prediction
         prediction = F.pairwise_distance(y1, y2)
         print(f"prediction before: {prediction}")
-        if prediction > 1.5:
-          prediction = torch.FloatTensor([1])
-        else:
-          prediction = torch.FloatTensor([0])
+
+        # Apply thresholding to each element
+        prediction = (prediction > 1.5).float()
         print(f"prediction after: {prediction}")
         predictions.append(prediction)
-        if prediction.item() == label.item():
-          correct += 1
+        
+        # Compare each item individually
+        correct += (prediction == label).sum().item()
 
     print(f"{correct/len(predictions)}")  

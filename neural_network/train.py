@@ -13,6 +13,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+# find device
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(device)
+
 # set random seed
 random.seed(41)
 torch.manual_seed(41)
@@ -103,7 +107,7 @@ if __name__ == "__main__":
     plt.show()
 
     # create a instance of model, choose loss function and optimizer
-    model = SiameseNetwork()
+    model = SiameseNetwork().to(device)
     criterion = ContrastiveLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr = 0.001)
 
@@ -116,6 +120,8 @@ if __name__ == "__main__":
     for i in range(epochs):
         # train
         for b, (X1, X2, label) in enumerate(train_dataloader):
+            # move to device
+            X1, X2, label = X1.to(device), X2.to(device), label.to(device)
             # Zero the gradients
             optimizer.zero_grad()
             # Get results from model

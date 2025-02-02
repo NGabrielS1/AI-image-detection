@@ -99,7 +99,7 @@ if __name__ == "__main__":
     test_dataloader = DataLoader(test_dataset, shuffle=False, num_workers=4, batch_size=10)
 
     # load saved model
-    model = SiameseNetwork()
+    model = SiameseNetwork().to(device)
     model.load_state_dict(torch.load("AI_DETECTOR_SIAMESE.pt", map_location=torch.device('cpu')))
 
     # variables
@@ -115,14 +115,42 @@ if __name__ == "__main__":
         y1, y2 = model(X1, X2)
         # get prediction
         prediction = F.pairwise_distance(y1, y2)
-        print(f"prediction before: {prediction}")
 
         # Apply thresholding to each element
         prediction = (prediction > 1.5).float()
-        print(f"prediction after: {prediction}")
         predictions.append(prediction)
-        
+
         # Compare each item individually
         correct += (prediction == label).sum().item()
 
-    print(f"{correct/len(predictions)}")  
+    print(f"{correct/len(predictions)*100}%")
+
+    # show example
+    example_predictions = []
+    # Get the first batch
+    X1, X2, label = next(iter(test_dataloader))  # Get only the first batch
+    # Move to device
+    X1, X2, label = X1.to(device), X2.to(device), label.to(device)
+
+    # Get results from model
+    with torch.no_grad():
+        y1, y2 = model(X1, X2)
+        
+        # Get pairwise distance
+        prediction = F.pairwise_distance(y1, y2)
+
+        # Apply thresholding
+        prediction = (prediction > 1.5).float()
+
+        # Convert to list before appending
+        example_predictions.extend(prediction.tolist())
+
+    # Display images
+    concatenated = make_grid(torch.cat((X1, X2), 0)).detach().numpy()  # Ensure it's on CPU before converting to numpy
+    plt.imshow(np.transpose(concatenated, (1, 2, 0)))
+
+    # Print predictions
+    print("Predictions:", example_predictions)
+
+    # Show plot
+    plt.show()

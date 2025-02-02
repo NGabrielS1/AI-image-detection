@@ -108,7 +108,7 @@ if __name__ == "__main__":
     # create a instance of model, choose loss function and optimizer
     model = SiameseNetwork().to(device)
     criterion = ContrastiveLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr = 0.001)
+    optimizer = torch.optim.Adam(model.parameters(), lr = 0.0005)
 
     # variables
     epochs = 5

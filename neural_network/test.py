@@ -90,62 +90,34 @@ class ContrastiveLoss(torch.nn.Module):
 
       return loss_contrastive
 
-# create dataloaders
+# testing
 if __name__ == "__main__":
     # load datasets
-    train_dataset = CreateDataset(datasets.ImageFolder(root="./data/train/"))
+    test_dataset = CreateDataset(datasets.ImageFolder(root="./AI-image-detection/data/test/"))
 
     # create dataloaders
-    train_dataloader = DataLoader(train_dataset, shuffle=True, num_workers=4, batch_size=64)
-
-    # see 1 batch
-    example_batch = next(iter(train_dataloader))
-    concatenated = make_grid(torch.cat((example_batch[0], example_batch[1]),0)).numpy()
-    print(example_batch[2].reshape(-1))
-    plt.imshow(np.transpose(concatenated, (1, 2, 0)))
-    plt.show()
-
-    # create a instance of model, choose loss function and optimizer
-    model = SiameseNetwork().to(device)
-    criterion = ContrastiveLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr = 0.001)
+    test_dataloader = DataLoader(test_dataset, shuffle=False, num_workers=4, batch_size=10)
 
     # variables
-    epochs = 5
-    train_losses = []
-    start_time = time.time()
+    correct = 0
+    predictions = []
 
-    # Loop of Epochs
-    for i in range(epochs):
-        # train
-        for b, (X1, X2, label) in enumerate(train_dataloader):
-            # move to device
-            X1, X2, label = X1.to(device), X2.to(device), label.to(device)
-            # Zero the gradients
-            optimizer.zero_grad()
-            # Get results from model
-            y1, y2 = model(X1, X2)
-            # Pass results and label to loss function
-            loss = criterion(y1, y2, label)
-            # Calculate backpropagation and optimize
-            loss.backward()
-            optimizer.step()
+    # put model in eval mode
+    model.eval()
+    with torch.no_grad():
+      for b, (X1, X2, label) in enumerate(test_dataloader):
+        # move to device
+        X1, X2, label = X1.to(device), X2.to(device), label.to(device)
+        # Get results from model
+        y1, y2 = model(X1, X2)
+        # get prediction
+        prediction = F.pairwise_distance(y1, y2)
+        if prediction > 1.5:
+          prediction = torch.FloatTensor([1])
+        else:
+          prediction = torch.FloatTensor([0])
+        predictions.append(prediction)
+        if prediction.item() == label.item():
+          correct += 1
 
-            # print loss
-            if b % 100 == 0:
-                print(f"Epoch: {i}, Batch: {b}, Loss: {loss.item()}")
-        
-        # track loss each epoch
-        train_losses.append(loss.item())
-
-    # print time taken
-    print(f"Training Took: {(time.time()-start_time)/60} minutes!")
-
-    # Graph the loss at each epoch
-    train_losses = [tl for tl in train_losses]
-    plt.plot(train_losses, label="Training Losses")
-    plt.title("Loss at Epoch")
-    plt.show()
-
-    # save our NN model
-    torch.save(model.state_dict(), "AI_DETECTOR_SIAMESE.pt")
+    print(f"{correct/len(predictions)}")  

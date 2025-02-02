@@ -117,12 +117,15 @@ if __name__ == "__main__":
         prediction = F.pairwise_distance(y1, y2)
 
         # Apply thresholding to each element
-        prediction = (prediction > 1.5).float()
+        prediction = (prediction > 0.1).float()
         predictions.append(prediction)
 
         # Compare each item individually
         correct += (prediction == label).sum().item()
-        print(f"Batch: {b}")
+
+        # print batch
+        if b % 100 == 0:
+          print(f"Batch: {b}")
 
     print(f"{correct/len(predictions)*100}%")
 
@@ -141,7 +144,7 @@ if __name__ == "__main__":
         prediction = F.pairwise_distance(y1, y2)
 
         # Apply thresholding
-        prediction = (prediction > 1.5).float()
+        prediction = (prediction > 0.1).float()
 
         # Convert to list before appending
         example_predictions.extend(prediction.tolist())
@@ -152,6 +155,7 @@ if __name__ == "__main__":
 
     # Print predictions
     print("Predictions:", example_predictions)
+    print("Labels:", label.tolist())
 
     # Show plot
     plt.show()

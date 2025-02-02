@@ -122,6 +122,7 @@ if __name__ == "__main__":
 
         # Compare each item individually
         correct += (prediction == label).sum().item()
+        print(f"Batch: {b}")
 
     print(f"{correct/len(predictions)*100}%")
 

@@ -1,4 +1,4 @@
 # AI-image-detection
-AI image detection using siamese neural network and transfer learning
+A Simple AI Image Detection Program Using Siamese Neural Networks (SNNs) and Transfer Learning (gabriel)
 
 Uses the AI-Artbench dataset https://www.kaggle.com/datasets/ravidussilva/real-ai-art

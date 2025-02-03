@@ -24,10 +24,13 @@ torch.manual_seed(41)
 # Function to create dataset and labels
 class CreateDataset(Dataset):
     def __init__(self,imageFolderDataset):
-        self.imageFolderDataset = imageFolderDataset    
+        self.imageFolderDataset = imageFolderDataset
+        # data transformation and augmentation    
         self.transform = transforms.Compose([
             transforms.Resize((256,256)),
             transforms.Grayscale(num_output_channels=1),
+            transforms.RandomVerticalFlip(p=0.5),
+            transforms.RandomHorizontalFlip(p=0.5),
             transforms.ToTensor()
         ])
         
@@ -67,13 +70,19 @@ class SiameseNetwork(nn.Module):
         super().__init__()
         # load ResNet50 (transfer learning)
         self.resnet50 = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_resnet50', pretrained=True)
-        # change input and output
+        # change input
         self.resnet50.conv1 = nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+        # add dropout layer
+        self.dropout = nn.Dropout2d(p=0.2)
+        # change output
         self.resnet50.fc = nn.Linear(in_features=2048, out_features=2, bias=True)
 
     def forward(self, X1, X2):
         y1 = self.resnet50(X1)
         y2 = self.resnet50(X2)
+
+        y1 = self.dropout(y1)
+        y2 = self.dropout(y2)
 
         return y1, y2
 
@@ -111,7 +120,7 @@ if __name__ == "__main__":
     # create a instance of model, choose loss function and optimizer
     model = SiameseNetwork().to(device)
     criterion = ContrastiveLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr = 0.0005)
+    optimizer = torch.optim.Adam(model.parameters(), lr = 0.0005, weight_decay=0.0005)
 
     # variables
     epochs = 5

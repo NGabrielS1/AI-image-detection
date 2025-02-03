@@ -154,6 +154,7 @@ if __name__ == "__main__":
             # track loss during validation
             loss = criterion(y1, y2, label)
             valid_losses.append(loss.item())
+            print(f"Validation Epoch: {i}, Loss: {loss.item()}")
 
 
 

@@ -99,7 +99,7 @@ if __name__ == "__main__":
 
     # create dataloaders
     train_dataloader = DataLoader(train_dataset, shuffle=True, num_workers=4, batch_size=10)
-    valid_dataloader = DataLoader(test_dataset, shuffle=False, num_workers=4, batch_size=20000)
+    valid_dataloader = DataLoader(test_dataset, shuffle=False, num_workers=4, batch_size=200)
 
     # see 1 batch
     example_batch = next(iter(train_dataloader))
@@ -146,14 +146,17 @@ if __name__ == "__main__":
 
         # validate
         with torch.no_grad():
+            epoch_loss = []
             for b, (X1, X2, label) in enumerate(valid_dataloader):
                 # move to device
                 X1, X2, label = X1.to(device), X2.to(device), label.to(device)
                 # Get results from model
                 y1, y2 = model(X1, X2)
+                # get loss
+                loss = criterion(y1, y2, label)
+                epoch_loss.append(loss.item())
             # track loss during validation
-            loss = criterion(y1, y2, label)
-            valid_losses.append(loss.item())
+            valid_losses.append(mean(epoch_loss))
             print(f"Validation Epoch: {i}, Loss: {loss.item()}")
 
 

@@ -128,7 +128,7 @@ if __name__ == "__main__":
             X1, X2, label = X1.to(device), X2.to(device), label.to(device)
             # Zero the gradients
             optimizer.zero_grad()
-            # Get results from model
+            # Get results from model l
             y1, y2 = model(X1, X2)
             # Pass results and label to loss function
             loss = criterion(y1, y2, label)

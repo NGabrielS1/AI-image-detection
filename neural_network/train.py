@@ -132,7 +132,7 @@ if __name__ == "__main__":
             y1, y2 = model(X1, X2)
             # Pass results and label to loss function
             loss = criterion(y1, y2, label)
-            epoch_loss.append[loss.item()]
+            epoch_loss.append(loss.item())
             # Calculate backpropagation and optimize
             loss.backward()
             optimizer.step()

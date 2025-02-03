@@ -142,7 +142,6 @@ if __name__ == "__main__":
     print(f"Training Took: {(time.time()-start_time)/60} minutes!")
 
     # Graph the loss at each epoch
-    train_losses = [tl for tl in train_losses]
     plt.plot(train_losses, label="Training Losses")
     plt.title("Loss at Epoch")
     plt.show()

@@ -99,7 +99,7 @@ if __name__ == "__main__":
 
     # create dataloaders
     train_dataloader = DataLoader(train_dataset, shuffle=True, num_workers=4, batch_size=10)
-    valid_dataloader = DataLoader(test_dataset, shuffle=False, num_workers=4, batch_size=2000)
+    valid_dataloader = DataLoader(test_dataset, shuffle=False, num_workers=4, batch_size=20000)
 
     # see 1 batch
     example_batch = next(iter(train_dataloader))

@@ -3,6 +3,7 @@ import numpy as np
 import random
 from PIL import Image
 import time
+from statistics import mean
 
 from torchvision.utils import make_grid
 from torchvision import datasets, transforms
@@ -94,9 +95,11 @@ class ContrastiveLoss(torch.nn.Module):
 if __name__ == "__main__":
     # load datasets
     train_dataset = CreateDataset(datasets.ImageFolder(root="./data/train/"))
+    test_dataset = CreateDataset(datasets.ImageFolder(root="./data/test/"))
 
     # create dataloaders
     train_dataloader = DataLoader(train_dataset, shuffle=True, num_workers=4, batch_size=10)
+    valid_dataloader = DataLoader(test_dataset, shuffle=False, num_workers=4, batch_size=2000)
 
     # see 1 batch
     example_batch = next(iter(train_dataloader))
@@ -113,10 +116,12 @@ if __name__ == "__main__":
     # variables
     epochs = 5
     train_losses = []
+    valid_losses = []
     start_time = time.time()
 
     # Loop of Epochs
     for i in range(epochs):
+        epoch_loss = []
         # train
         for b, (X1, X2, label) in enumerate(train_dataloader):
             # move to device
@@ -127,6 +132,7 @@ if __name__ == "__main__":
             y1, y2 = model(X1, X2)
             # Pass results and label to loss function
             loss = criterion(y1, y2, label)
+            epoch_loss.append[loss.item()]
             # Calculate backpropagation and optimize
             loss.backward()
             optimizer.step()
@@ -136,14 +142,29 @@ if __name__ == "__main__":
                 print(f"Epoch: {i}, Batch: {b}, Loss: {loss.item()}")
         
         # track loss each epoch
-        train_losses.append(loss.item())
+        train_losses.append(mean(epoch_loss))
+
+        # validate
+        with torch.no_grad():
+            for b, (X1, X2, label) in enumerate(valid_dataloader):
+                # move to device
+                X1, X2, label = X1.to(device), X2.to(device), label.to(device)
+                # Get results from model
+                y1, y2 = model(X1, X2)
+            # track loss during validation
+            loss = criterion(y1, y2, label)
+            valid_losses.append(loss.item())
+
+
 
     # print time taken
     print(f"Training Took: {(time.time()-start_time)/60} minutes!")
 
     # Graph the loss at each epoch
     plt.plot(train_losses, label="Training Losses")
+    plt.plot(valid_losses, label="Validation Losses")
     plt.title("Loss at Epoch")
+    plt.legend()
     plt.show()
 
     # save our NN model

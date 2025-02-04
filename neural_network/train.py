@@ -164,7 +164,7 @@ if __name__ == "__main__":
             print(f"Validation Epoch: {epoch}, Loss: {loss.item()}")
 
         # learning rate scheduler
-        scheduler.step(epoch)
+        scheduler.step()
 
 
 

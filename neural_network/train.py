@@ -123,7 +123,7 @@ if __name__ == "__main__":
     valid_losses = []
     start_time = time.time()
     patience = 3
-    wait = 0
+    wait_epoch = 0
     best_loss = float('inf')
 
     # Loop of Epochs
@@ -173,15 +173,12 @@ if __name__ == "__main__":
         if valid_losses[-1] < best_loss:
             best_loss = valid_losses[-1]
             torch.save(model.state_dict(), f"{epoch} AI_DETECTOR_SIAMESE.pt")
-            wait = 0
+            wait_epoch = 0
         else:
-            wait += 1
-            if wait >= patience:
+            wait_epoch += 1
+            if wait_epoch >= patience:
                 print("EARLY STOP")
                 break
-
-
-
 
     # print time taken
     print(f"Training Took: {(time.time()-start_time)/60} minutes!")

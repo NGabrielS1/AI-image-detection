@@ -9,7 +9,7 @@ from torchvision.utils import make_grid
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, Dataset
 import torchvision.models as models
-from torchvision.models import resnet34, ResNet34_Weights
+from torchvision.models import ResNet34_Weights
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

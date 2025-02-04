@@ -75,7 +75,7 @@ class SiameseNetwork(nn.Module):
         self.resnet34.conv1 = nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
         # add dropout layer and change output
         self.resnet34.fc = nn.Identity()
-        self.resnet34.add_module("dropout", nn.Dropout(p=0.2))
+        self.resnet34.add_module("dropout", nn.Dropout(p=0.5))
         self.resnet34.add_module("fc2", nn.Linear(in_features=512, out_features=2, bias=True))
 
     def forward(self, X1, X2):
@@ -105,7 +105,7 @@ if __name__ == "__main__":
     test_dataset = CreateDataset(datasets.ImageFolder(root="./data/test/"))
 
     # create dataloaders
-    train_dataloader = DataLoader(train_dataset, shuffle=True, num_workers=4, batch_size=10)
+    train_dataloader = DataLoader(train_dataset, shuffle=True, num_workers=4, batch_size=64)
     valid_dataloader = DataLoader(test_dataset, shuffle=False, num_workers=4, batch_size=200)
 
     # see 1 batch

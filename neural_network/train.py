@@ -29,7 +29,6 @@ class CreateDataset(Dataset):
         # data transformation and augmentation    
         self.transform = transforms.Compose([
             transforms.Resize((256,256)),
-            transforms.Grayscale(num_output_channels=1),
             transforms.RandomVerticalFlip(p=0.5),
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.ToTensor()
@@ -71,8 +70,6 @@ class SiameseNetwork(nn.Module):
         super().__init__()
         # load ResNet34(transfer learning)
         self.resnet34 = models.resnet34(weights=ResNet34_Weights.DEFAULT)
-        # change input
-        self.resnet34.conv1 = nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
         # add dropout layer and change output
         self.resnet34.fc = nn.Identity()
         self.resnet34.add_module("dropout", nn.Dropout(p=0.5))

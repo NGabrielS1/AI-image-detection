@@ -130,6 +130,7 @@ if __name__ == "__main__":
     for epoch in range(10):
         epoch_loss = []
         # train
+        model.train()
         for b, (X1, X2, label) in enumerate(train_dataloader):
             # move to device
             X1, X2, label = X1.to(device), X2.to(device), label.to(device)
@@ -152,6 +153,7 @@ if __name__ == "__main__":
         train_losses.append(mean(epoch_loss))
 
         # validate
+        model.eval()
         with torch.no_grad():
             epoch_loss = []
             for b, (X1, X2, label) in enumerate(valid_dataloader):

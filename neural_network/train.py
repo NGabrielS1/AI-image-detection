@@ -172,7 +172,7 @@ if __name__ == "__main__":
         # early stopping
         if valid_losses[-1] < best_loss:
             best_loss = valid_losses[-1]
-            torch.save(model.state_dict(), f"{epoch} AI_DETECTOR_SIAMESE.pt")
+            torch.save(model.state_dict(), f"Early-AI_DETECTOR_SIAMESE.pt")
             wait_epoch = 0
         else:
             wait_epoch += 1

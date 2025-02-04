@@ -72,7 +72,7 @@ class SiameseNetwork(nn.Module):
         self.resnet34 = models.resnet34(weights=ResNet34_Weights.DEFAULT)
         # add dropout layer and change output
         self.resnet34.fc = nn.Identity()
-        self.resnet34.add_module("dropout", nn.Dropout(p=0.5))
+        self.resnet34.add_module("dropout", nn.Dropout(p=0.3))
         self.resnet34.add_module("fc2", nn.Linear(in_features=512, out_features=2, bias=True))
 
     def forward(self, X1, X2):
@@ -115,7 +115,7 @@ if __name__ == "__main__":
     # create a instance of model, choose loss function and optimizer
     model = SiameseNetwork().to(device)
     criterion = ContrastiveLoss()
-    optimizer = torch.optim.AdamW(model.parameters(), lr = 0.01, weight_decay=0.001)
+    optimizer = torch.optim.AdamW(model.parameters(), lr = 0.001, weight_decay=0.01)
     scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer=optimizer, milestones=[3,7], gamma=0.1)
 
     # variables

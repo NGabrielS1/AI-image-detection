@@ -115,7 +115,7 @@ if __name__ == "__main__":
     # create a instance of model, choose loss function and optimizer
     model = SiameseNetwork().to(device)
     criterion = ContrastiveLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr = 0.05, weight_decay=0.0005)
+    optimizer = torch.optim.AdamW(model.parameters(), lr = 0.05, weight_decay=0.0005)
     scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer=optimizer, milestones=[1,3], gamma=0.1)
 
     # variables

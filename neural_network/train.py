@@ -72,7 +72,7 @@ class SiameseNetwork(nn.Module):
         self.resnet34 = models.resnet34(weights=ResNet34_Weights.DEFAULT)
         # add dropout layer and change output
         self.resnet34.fc = nn.Identity()
-        self.resnet34.add_module("dropout", nn.Dropout(p=0.3))
+        self.resnet34.add_module("dropout", nn.Dropout(p=0.5))
         self.resnet34.add_module("fc2", nn.Linear(in_features=512, out_features=2, bias=True))
 
     def forward(self, X1, X2):

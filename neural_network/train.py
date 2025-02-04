@@ -8,7 +8,8 @@ from statistics import mean
 from torchvision.utils import make_grid
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, Dataset
-import torchvision.utils
+import torchvision.models as models
+from torchvision.models import resnet34, ResNet34_Weights
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -68,18 +69,18 @@ class CreateDataset(Dataset):
 class SiameseNetwork(nn.Module):
     def __init__(self):
         super().__init__()
-        # load ResNet50 (transfer learning)
-        self.resnet50 = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_resnet50', pretrained=True)
+        # load ResNet34(transfer learning)
+        self.resnet34 = models.resnet34(weights=ResNet34_Weights.DEFAULT)
         # change input
-        self.resnet50.conv1 = nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+        self.resnet34.conv1 = nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
         # add dropout layer and change output
-        self.resnet50.fc = nn.Identity()
-        self.resnet50.add_module("dropout", nn.Dropout(p=0.2))
-        self.resnet50.add_module("fc2", nn.Linear(in_features=2048, out_features=2, bias=True))
+        self.resnet34.fc = nn.Identity()
+        self.resnet34.add_module("dropout", nn.Dropout(p=0.2))
+        self.resnet34.add_module("fc2", nn.Linear(in_features=512, out_features=2, bias=True))
 
     def forward(self, X1, X2):
-        y1 = self.resnet50(X1)
-        y2 = self.resnet50(X2)
+        y1 = self.resnet34(X1)
+        y2 = self.resnet34(X2)
 
         return y1, y2
 

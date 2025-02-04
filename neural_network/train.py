@@ -118,16 +118,16 @@ if __name__ == "__main__":
     # create a instance of model, choose loss function and optimizer
     model = SiameseNetwork().to(device)
     criterion = ContrastiveLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr = 0.0005, weight_decay=0.0005)
+    optimizer = torch.optim.Adam(model.parameters(), lr = 0.05, weight_decay=0.0005)
+    scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer=optimizer, milestones=[1,3], gamma=0.1)
 
     # variables
-    epochs = 5
     train_losses = []
     valid_losses = []
     start_time = time.time()
 
     # Loop of Epochs
-    for i in range(epochs):
+    for epoch in range(5):
         epoch_loss = []
         # train
         for b, (X1, X2, label) in enumerate(train_dataloader):
@@ -146,7 +146,7 @@ if __name__ == "__main__":
 
             # print loss
             if b % 100 == 0:
-                print(f"Epoch: {i}, Batch: {b}, Loss: {loss.item()}")
+                print(f"Epoch: {epoch}, Batch: {b}, Loss: {loss.item()}")
         
         # track loss each epoch
         train_losses.append(mean(epoch_loss))
@@ -164,7 +164,10 @@ if __name__ == "__main__":
                 epoch_loss.append(loss.item())
             # track loss during validation
             valid_losses.append(mean(epoch_loss))
-            print(f"Validation Epoch: {i}, Loss: {loss.item()}")
+            print(f"Validation Epoch: {epoch}, Loss: {loss.item()}")
+
+        # learning rate scheduler
+        scheduler.step(epoch)
 
 
 

@@ -122,6 +122,9 @@ if __name__ == "__main__":
     train_losses = []
     valid_losses = []
     start_time = time.time()
+    patience = 3
+    wait = 0
+    best_loss = float('inf')
 
     # Loop of Epochs
     for epoch in range(10):
@@ -165,6 +168,18 @@ if __name__ == "__main__":
 
         # learning rate scheduler
         scheduler.step()
+
+        # early stopping
+        if valid_losses[-1] < best_loss:
+            best_loss = valid_losses[-1]
+            torch.save(model.state_dict(), f"{epoch} AI_DETECTOR_SIAMESE.pt")
+            wait = 0
+        else:
+            wait += 1
+            if wait >= patience:
+                print("EARLY STOP")
+                break
+
 
 
 

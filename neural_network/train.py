@@ -166,7 +166,7 @@ if __name__ == "__main__":
                 epoch_loss.append(loss.item())
             # track loss during validation
             valid_losses.append(mean(epoch_loss))
-            print(f"Validation Epoch: {epoch}, Loss: {loss.item()}")
+            print(f"Validation Epoch: {epoch}, Loss: {mean(epoch_loss)}")
 
         # learning rate scheduler
         scheduler.step()
@@ -175,6 +175,7 @@ if __name__ == "__main__":
         if valid_losses[-1] < best_loss:
             best_loss = valid_losses[-1]
             torch.save(model.state_dict(), f"Early-AI_DETECTOR_SIAMESE.pt")
+            print("Saved")
             wait_epoch = 0
         else:
             wait_epoch += 1

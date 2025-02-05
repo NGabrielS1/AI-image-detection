@@ -74,10 +74,15 @@ class SiameseNetwork(nn.Module):
         self.resnet34.fc = nn.Identity()
         self.resnet34.add_module("dropout", nn.Dropout(p=0.5))
         self.resnet34.add_module("fc2", nn.Linear(in_features=512, out_features=2, bias=True))
+    
+    def forward_once(self, X):
+        y = self.resnet34(X)
+
+        return y
 
     def forward(self, X1, X2):
-        y1 = self.resnet34(X1)
-        y2 = self.resnet34(X2)
+        y1 = self.forward_once(X1)
+        y2 = self.forward_once(X2)
 
         return y1, y2
 

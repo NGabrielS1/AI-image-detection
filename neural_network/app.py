@@ -90,4 +90,5 @@ def resize(event):
 side_frame.bind('<Configure>', resize)
 
 # Run application
-app.mainloop()
+if __name__ == "__main__":
+    app.mainloop()

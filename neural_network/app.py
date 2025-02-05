@@ -23,7 +23,8 @@ class App(ctk.CTk):
 
         # widgets
         # images
-        self.upload_img = ctk.CTkImage(Image.open("neural_network/upload-button.png"))
+        current_path = os.path.dirname(os.path.realpath(__file__))
+        self.upload_img = ctk.CTkImage(Image.open(current_path+"/upload-button.png"))
 
         # frames
         self.side_frame = ctk.CTkFrame(master=self, corner_radius=0)

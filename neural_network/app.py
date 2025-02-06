@@ -32,34 +32,64 @@ class App(ctk.CTk):
         self.bg_image_pil = Image.open(current_path+"/background.png")
         self.bg_img = ctk.CTkImage(self.bg_image_pil,size=(self.width, self.height))
         # fonts
-        LS_font = current_path+"/LeagueSpartan-Regular.ttf"
-        M_font = current_path+"/Montserrat-Regular.ttf"
+        LS_font = current_path+"/LeagueSpartan-Bold.ttf"
+        M_font = current_path+"/Montserrat-Medium.ttf"
 
         # background image
         self.bg_image_label = ctk.CTkLabel(master=self, image=self.bg_img, text="")
         self.bg_image_label.grid(column=0,row=0)
 
         # title page
-        self.welcome_label = ctk.CTkLabel(master=self, text="WELCOME TO TKINTER", fg_color="transparent")
-        self.welcome_label.configure(image=self.transparent(0, 0, self.welcome_label, text=True, font=M_font))
-        self.welcome_label.place(x=0,y=0)
+        self.welcome_label = ctk.CTkLabel(master=self)
+        self.welcome_label.configure(image=self.transparent(55, 90, widget=self.welcome_label, text_func=True, text="WELCOME TO", font=M_font))
+        self.welcome_label.place(x=55,y=90)
+
+        self.title_label = ctk.CTkLabel(master=self)
+        self.title_label.configure(image=self.transparent(55, 122, widget=self.title_label, text_func=True, text="AI IMAGE \nDETECTOR", font=LS_font, font_size=98))
+        self.title_label.place(x=55,y=122)
+
+        self.start_btn = ctk.CTkButton(master=self, width=200, height=50, text="", corner_radius=50, fg_color="#0fb568", hover_color="#0fb568", bg_color="black", text_color="black", font=("Free Sans", 20), \
+            image=self.transparent(55, 450, text_func=True, text="START NOW", font=M_font, font_size=17, bg_color=(15, 181, 104),pad=(17,0), color=(0,0,0)))
+        self.start_btn.place(x=55,y=450)
+
+        # self.welcome_label.destroy()
+        # self.title_label.destroy()
+        # self.start_btn.destroy()
 
     # helper functions
-    def transparent(self, x, y, widget, text=False, font=None, color=(255,255,255), font_size = 22):
-        self.update_idletasks()
-        width = widget.winfo_reqwidth()
-        height = widget.winfo_reqheight()
-        image = self.bg_image_pil.crop((x, y, x+(width*1), y+(height*1))).convert("RGBA")
+    def transparent(self, x, y, widget=None, text_func=False, text=None, font=None, color=None, font_size=None, width=None, height=None, bg_color=None, pad=None):
+        if color == None:
+            color = (255,255,255)
+        if font_size == None:
+            font_size = 22
+        if pad == None:
+            pad = (0,0)
+        
+        width=width
+        height=height
 
-        if text:
+        # draw text
+        if text_func:
+            width = len(text)*font_size
+            height = font_size+5
             fill = color
-            text = widget.cget("text")
+            text = text
             font = font
             font_size = font_size
-            font = ImageFont.truetype(font=font, size=font_size-2)
-            ImageDraw.Draw(image).text(xy=(5, 5), text=text, font=font, fill=fill, anchor='lt')
-            image = image.resize((width, height), Image.LANCZOS)
-            widget.configure(text="")
+            font = ImageFont.truetype(font=font, size=font_size)
+            # multiline
+            text = text.split("\n")
+            height *= len(text)
+            if bg_color is None:
+                image = self.bg_image_pil.crop((x, y, x+width, y+height)).convert("RGBA")
+            else:
+                image = Image.new(mode="RGBA", size=(width, height), color=bg_color)
+            draw = ImageDraw.Draw(image)
+            draw.fontmode = "L"
+            for i, line in enumerate(text):
+                draw.text(xy=(5+pad[0], 5+pad[1] + (font_size*i)), text=line, font=font, fill=fill, anchor="lt")
+            if widget != None:
+                widget.configure(text="")
 
         image = ctk.CTkImage(image, size=(width,height))
         return image

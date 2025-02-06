@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from customtkinter import filedialog
-from PIL import Image, ImageEnhance
+from PIL import Image, ImageFont, ImageDraw
 import threading
 import sys
 import os
@@ -32,24 +32,35 @@ class App(ctk.CTk):
         self.bg_image_pil = Image.open(current_path+"/background.png")
         self.bg_img = ctk.CTkImage(self.bg_image_pil,size=(self.width, self.height))
         # fonts
-        ctk.FontManager.load_font("LeagueSpartan-Regular.ttf")
-        ctk.FontManager.load_font("Montserrat-Regular.ttf")
+        LS_font = current_path+"/LeagueSpartan-Regular.ttf"
+        M_font = current_path+"/Montserrat-Regular.ttf"
 
         # background image
         self.bg_image_label = ctk.CTkLabel(master=self, image=self.bg_img, text="")
         self.bg_image_label.grid(column=0,row=0)
 
         # title page
-        self.welcome_label = ctk.CTkLabel(master=self, text="WELCOME TO", font=("Montserrat-Regular.ttf",11), fg_color="transparent")
-        self.welcome_label.configure(image=self.transparent(0, 0, self.welcome_label))
+        self.welcome_label = ctk.CTkLabel(master=self, text="WELCOME TO TKINTER", fg_color="transparent")
+        self.welcome_label.configure(image=self.transparent(0, 0, self.welcome_label, text=True, font=M_font))
         self.welcome_label.place(x=0,y=0)
 
-    # functions
-    def transparent(self, x, y, widget):
+    # helper functions
+    def transparent(self, x, y, widget, text=False, font=None, color=(255,255,255), font_size = 22):
         self.update_idletasks()
         width = widget.winfo_reqwidth()
         height = widget.winfo_reqheight()
-        image = self.bg_image_pil.crop((x, y, x+(width*1), y+(height*1)))
+        image = self.bg_image_pil.crop((x, y, x+(width*1), y+(height*1))).convert("RGBA")
+
+        if text:
+            fill = color
+            text = widget.cget("text")
+            font = font
+            font_size = font_size
+            font = ImageFont.truetype(font=font, size=font_size-2)
+            ImageDraw.Draw(image).text(xy=(5, 5), text=text, font=font, fill=fill, anchor='lt')
+            image = image.resize((width, height), Image.LANCZOS)
+            widget.configure(text="")
+
         image = ctk.CTkImage(image, size=(width,height))
         return image
 

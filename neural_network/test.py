@@ -6,6 +6,7 @@ import time
 from statistics import mean
 
 from torchvision.utils import make_grid
+import torchvision
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, Dataset
 import torchvision.models as models
@@ -16,6 +17,7 @@ import torch.nn.functional as F
 
 # find device
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(device)
 
 # set random seed
 random.seed(41)
@@ -98,6 +100,19 @@ class ContrastiveLoss(torch.nn.Module):
       loss_contrastive = torch.mean((1-label) * torch.pow(euclidean_distance, 2) + (label) * torch.pow(torch.clamp(self.margin - euclidean_distance, min=0.0), 2))
 
       return loss_contrastive
+    
+def imshow(img, text=None):
+    npimg = img.numpy()
+    plt.axis("off")
+    if text:
+        plt.text(75, 8, text, style='italic',fontweight='bold',
+            bbox={'facecolor':'white', 'alpha':0.8, 'pad':10})
+        
+    plt.imshow(np.transpose(npimg, (1, 2, 0)))
+    plt.show()    
+
+model = SiameseNetwork().to(device)
+model.load_state_dict(torch.load(("AI_DETECTOR_SIAMESE.pt"),map_location=torch.device('cpu')))
 
 # create dataloaders
 if __name__ == "__main__":
@@ -106,77 +121,30 @@ if __name__ == "__main__":
     test_dataset = CreateDataset(datasets.ImageFolder(root="./data/test/"))
 
     # create dataloaders
-    train_dataloader = DataLoader(train_dataset, shuffle=True, num_workers=4, batch_size=64)
-    valid_dataloader = DataLoader(test_dataset, shuffle=False, num_workers=4, batch_size=64)
+    test_dataloader = DataLoader(test_dataset, shuffle=False, num_workers=4, batch_size=1)
 
-    # see 1 batch
-    example_batch = next(iter(train_dataloader))
-    concatenated = make_grid(torch.cat((example_batch[0], example_batch[1]),0)).numpy()
-    print(example_batch[2].reshape(-1))
-    plt.imshow(np.transpose(concatenated, (1, 2, 0)))
-    plt.show()
+    dataiter = iter(test_dataloader)
+    x0, _, _ = next(dataiter)
+    correct = 0
 
-    # create a instance of model, choose loss function and optimizer
-    model = SiameseNetwork().to(device)
-    criterion = ContrastiveLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr = 0.0005 )
+    model.eval()
+    with torch.no_grad():
+        for i in range(1000):
+            predlabel = 0
+            # Iterate over 10 images and test them with the first image (x0)
+            _, x1, label2 = next(dataiter)
 
-    # variables
-    train_losses = []
-    valid_losses = []
-    start_time = time.time()
-
-    # Loop of Epochs
-    for epoch in range(5):
-        epoch_loss = []
-        # train
-        model.train()
-        for b, (X1, X2, label) in enumerate(train_dataloader):
-            # move to device
-            X1, X2, label = X1.to(device), X2.to(device), label.to(device)
-            # Zero the gradients
-            optimizer.zero_grad()
-            # Get results from model l
-            y1, y2 = model(X1, X2)
-            # Pass results and label to loss function
-            loss = criterion(y1, y2, label)
-            epoch_loss.append(loss.item())
-            # Calculate backpropagation and optimize
-            loss.backward()
-            optimizer.step()
-
-            # print loss
-            if b % 100 == 0:
-                print(f"Epoch: {epoch}, Batch: {b}, Loss: {loss.item()}")
+            # Concatenate the two images together
+            concatenated = torch.cat((x0, x1), 0)
+            
+            output1, output2 = model(x0, x1)
+            euclidean_distance = F.pairwise_distance(output1, output2)
+            # imshow(torchvision.utils.make_grid(concatenated), f'Dissimilarity: {euclidean_distance.item():.2f}')
+            if euclidean_distance.item() < 1:
+                predlabel = 0.0
+            else:
+                predlabel = 1.0
+            if predlabel == label2.item():
+                correct += 1
         
-        # track loss each epoch
-        train_losses.append(mean(epoch_loss))
-
-        # validate
-        model.eval()
-        with torch.no_grad():
-            epoch_loss = []
-            for b, (X1, X2, label) in enumerate(valid_dataloader):
-                # move to device
-                X1, X2, label = X1.to(device), X2.to(device), label.to(device)
-                # Get results from model
-                y1, y2 = model(X1, X2)
-                # get loss
-                loss = criterion(y1, y2, label)
-                epoch_loss.append(loss.item())
-            # track loss during validation
-            valid_losses.append(mean(epoch_loss))
-            print(f"Validation Epoch: {epoch}, Loss: {loss.item()}")
-
-    # print time taken
-    print(f"Training Took: {(time.time()-start_time)/60} minutes!")
-
-    # Graph the loss at each epoch
-    plt.plot(train_losses, label="Training Losses")
-    plt.plot(valid_losses, label="Validation Losses")
-    plt.title("Loss at Epoch")
-    plt.legend()
-    plt.show()
-
-    # save our NN model
-    torch.save(model.state_dict(), "AI_DETECTOR_SIAMESE.pt")
+        print(correct/1000)

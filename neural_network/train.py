@@ -70,7 +70,6 @@ class SiameseNetwork(nn.Module):
         super().__init__()
         # load ResNet34(transfer learning)
         self.resnet34 = models.resnet34(weights=ResNet34_Weights.DEFAULT)
-        # add dropout layer and change output
         self.resnet34.conv1 = nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
         self.resnet34.fc = nn.Linear(in_features=512, out_features=2, bias=True)
     

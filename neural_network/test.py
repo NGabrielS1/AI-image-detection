@@ -4,6 +4,7 @@ import random
 from PIL import Image
 import time
 from statistics import mean
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 from torchvision.utils import make_grid
 import torchvision
@@ -72,7 +73,6 @@ class SiameseNetwork(nn.Module):
         super().__init__()
         # load ResNet34(transfer learning)
         self.resnet34 = models.resnet34(weights=ResNet34_Weights.DEFAULT)
-        # add dropout layer and change output
         self.resnet34.conv1 = nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
         self.resnet34.fc = nn.Linear(in_features=512, out_features=2, bias=True)
     
@@ -114,7 +114,6 @@ def imshow(img, text=None):
 model = SiameseNetwork().to(device)
 model.load_state_dict(torch.load(("AI_DETECTOR_SIAMESE.pt"),map_location=torch.device('cpu')))
 
-# create dataloaders
 if __name__ == "__main__":
     # load datasets
     train_dataset = CreateDataset(datasets.ImageFolder(root="./data/train/"))
@@ -122,20 +121,21 @@ if __name__ == "__main__":
 
     # create dataloaders
     test_dataloader = DataLoader(test_dataset, shuffle=False, num_workers=4, batch_size=1)
-
-    dataiter = iter(test_dataloader)
-    x0, _, _ = next(dataiter)
+    
+    # variables
     correct = 0
+    y_test = []
+    y_pred = []
 
     model.eval()
     with torch.no_grad():
-        for i in range(20000):
+        for b, (x0, x1, label) in enumerate(test_dataloader):
             predlabel = 0
-            # Iterate over 10 images and test them with the first image (x0)
-            _, x1, label2 = next(dataiter)
-
             # Concatenate the two images together
             concatenated = torch.cat((x0, x1), 0)
+
+            # move to device
+            x0, x1, label = x0.to(device), x1.to(device), label.to(device)
             
             output1, output2 = model(x0, x1)
             euclidean_distance = F.pairwise_distance(output1, output2)
@@ -144,7 +144,20 @@ if __name__ == "__main__":
                 predlabel = 0.0
             else:
                 predlabel = 1.0
-            if predlabel == label2.item():
+            if predlabel == label.item():
                 correct += 1
+            
+            # create list of predictions and labels
+            y_test.append(label.item())
+            y_pred.append(predlabel)
+            
+            if b % 1000 == 0:
+                print(b)
         
-        print(f"Accuracy: {correct/20000*100}%")
+        print(b+1)
+        # find accuracy
+        print(f"Accuracy: {correct/(b+1)*100}%")
+
+        # create confusion matrix
+        cm = confusion_matrix(y_test, y_pred)
+        ConfusionMatrixDisplay(cm).plot()

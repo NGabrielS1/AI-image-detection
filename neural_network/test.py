@@ -129,7 +129,7 @@ if __name__ == "__main__":
 
     model.eval()
     with torch.no_grad():
-        for i in range(1000):
+        for i in range(20000):
             predlabel = 0
             # Iterate over 10 images and test them with the first image (x0)
             _, x1, label2 = next(dataiter)
@@ -147,4 +147,4 @@ if __name__ == "__main__":
             if predlabel == label2.item():
                 correct += 1
         
-        print(correct/1000)
+        print(f"Accuracy: {correct/20000*100}%")

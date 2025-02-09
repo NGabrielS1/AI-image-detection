@@ -90,7 +90,7 @@ class App(ctk.CTk):
         self.bg_img = ctk.CTkImage(self.bg_image_pil,size=(self.width, self.height))
         self.page_img_pil = Image.open(current_path+"/page.png")
         self.page_img = ctk.CTkImage(self.page_img_pil, size=(self.width, self.height))
-        self.placeholder_image = ctk.CTkImage(self.page_img_pil.crop((260, 135, 260+287, 135+287)).convert("RGBA"), size=(287,287))
+        self.placeholder_image = ctk.CTkImage(self.page_img_pil.crop((256.5, 135, 256.5+287, 135+287)).convert("RGBA"), size=(287,287))
         next_img = self.page_img_pil.crop((300, 450, 300+200, 450+60)).convert("RGBA")
         next_img = Image.alpha_composite(next_img, Image.open(current_path+"/next.png").convert("RGBA"))
         self.next_img = ctk.CTkImage(next_img, size=(200,60))

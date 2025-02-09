@@ -4,8 +4,40 @@ from PIL import Image, ImageFont, ImageDraw
 import threading
 import os
 
+from torchvision import datasets, transforms
+from torch.utils.data import DataLoader, Dataset
+import torchvision.models as models
+from torchvision.models import ResNet34_Weights
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
 ctk.set_appearance_mode("dark")
 
+# find device
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+# Model Class
+class SiameseNetwork(nn.Module):
+    def __init__(self):
+        super().__init__()
+        # load ResNet34(transfer learning)
+        self.resnet34 = models.resnet34(weights=ResNet34_Weights.DEFAULT)
+        self.resnet34.conv1 = nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+        self.resnet34.fc = nn.Linear(in_features=512, out_features=2, bias=True)
+    
+    def forward_once(self, X):
+        y = self.resnet34(X)
+
+        return y
+
+    def forward(self, X1, X2):
+        y1 = self.forward_once(X1)
+        y2 = self.forward_once(X2)
+
+        return y1, y2
+
+# Main app
 class App(ctk.CTk):
     #variables
     file = 0
@@ -13,6 +45,7 @@ class App(ctk.CTk):
     width = 800
     height = 600
     analyzing = False
+    model = SiameseNetwork().to(device)
 
     def __init__(self):
         super().__init__()
@@ -162,6 +195,12 @@ class App(ctk.CTk):
         image.resize((287,287))
         self.image_label.configure(image=ctk.CTkImage(image,size=(self.image_label.winfo_width(),self.image_label.winfo_width())))
         self.analyzing = True
+
+        # get predictions
+        self.model.eval()
+        with torch.no_grad():
+            pass
+        
         self.analyzing = False
 
     def next_page(self):

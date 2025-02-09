@@ -16,6 +16,7 @@ class App(ctk.CTk):
     files = []
     width = 800
     height = 600
+    analyzing = False
 
     def __init__(self):
         super().__init__()
@@ -34,6 +35,9 @@ class App(ctk.CTk):
         self.page_img_pil = Image.open(current_path+"/page.png")
         self.page_img = ctk.CTkImage(self.page_img_pil, size=(self.width, self.height))
         self.placeholder_image = ctk.CTkImage(self.page_img_pil.crop((260, 135, 260+287, 135+287)).convert("RGBA"), size=(287,287))
+        next_img = self.page_img_pil.crop((300, 450, 300+200, 450+60)).convert("RGBA")
+        next_img = Image.alpha_composite(next_img, Image.open(current_path+"/next.png").convert("RGBA"))
+        self.next_img = ctk.CTkImage(next_img, size=(200,60))
 
 
         # fonts
@@ -79,6 +83,21 @@ class App(ctk.CTk):
         self.image_label = ctk.CTkLabel(self, height=287, width=287, text="", image=self.placeholder_image)
         self.image_label.place(x=260,y=135)
 
+        self.next_btn = ctk.CTkButton(self, height=60, width=200, image=self.next_img, text="", border_width=0, fg_color="transparent", corner_radius=0, command=self.next_file)
+        self.next_btn.place(x=300,y=450)
+
+        self.title_label2 = ctk.CTkLabel(master=self)
+        self.title_label2.configure(image=self.transparent(120, 60, widget=self.title_label2, text_func=True, text="AI IMAGE \nDETECTOR", font=self.LS_font, font_size=25))
+        self.title_label2.place(x=120,y=60)
+
+        self.counter_label1 = ctk.CTkLabel(self, text="", height=25,
+            image=self.transparent(450, 90, text_func=True, text="FILE DETECTED: ", font=self.M_font, font_size=20))
+        self.counter_label1.place(x=450, y=90)
+
+        self.counter_label2 = ctk.CTkLabel(self, text="", height=25,
+            image=self.transparent(630, 90, text_func=True, text="0", font=self.M_font, font_size=20, color=(255,0,0)))
+        self.counter_label2.place(x=630, y=90)
+
     # helper functions
     def transparent(self, x, y, widget=None, text_func=False, text=None, font=None, color=None, font_size=None, width=None, height=None, bg_color=None, pad=None, anchor=None):
         if color == None:
@@ -108,6 +127,11 @@ class App(ctk.CTk):
             font = ImageFont.truetype(font=font, size=font_size)
             # multiline
             text = text.split("\n")
+            if len(text) > 1:
+                lengths =[]
+                for line in text:
+                    lengths.append(len(line))
+                width = max(lengths)*font_size*2/3
             height *= len(text)
             if bg_color is None:
                 image = self.bg_image_pil.crop((x, y, x+width, y+height)).convert("RGBA")
@@ -130,41 +154,36 @@ class App(ctk.CTk):
         filename = self.files[self.file].name.split("/")[-1]
         self.file_name_label.configure(image=self.transparent(0,0, widget=self.file_name_label, text_func=True, text=f"{filename}", \
             font=self.M_font, font_size=30, bg_color=(23, 23, 23)))
-        # self.file_counter_label.configure(text=f"Files: {len(self.files)}")
+        self.counter_label2.configure(image=self.transparent(630, 90, text_func=True, text=f"{len(self.files)}", font=self.M_font, font_size=20, color=(255,0,0)))
         threading.Thread(target=self.process_image, args=(self.files[self.file].name,)).start()
 
-    # def next_file(self):
-    #     if self.file < len(self.files)-1:
-    #         self.file += 1
-    #         self.file_name.configure(text=f"{self.files[self.file].name}")
-    #         self.ai_label.configure(text="...", text_color="blue")
-    #         self.file_counter_label.configure(text=f"Files: {len(self.files) - self.file}")
-    #         threading.Thread(target=self.process_image, args=(self.files[self.file].name,)).start()
-    #     else:
-    #         self.files = []
-    #         self.file = 0
-    #         self.file_name.configure(text="No File")
-    #         self.file_counter_label.configure(text=f"Files: {len(self.files)}")
-    #         self.image_label.configure(image=None)
+    def next_file(self):
+        if not self.analyzing:
+            if self.file < len(self.files)-1:
+                self.file += 1
+                filename = self.files[self.file].name.split("/")[-1]
+                self.file_name_label.configure(image=self.transparent(0,0, widget=self.file_name_label, text_func=True, text=f"{filename}", \
+                    font=self.M_font, font_size=30, bg_color=(23, 23, 23)))
+                # self.ai_label.configure(text="...", text_color="blue")
+                self.counter_label2.configure(image=self.transparent(630, 90, text_func=True, text=f"{len(self.files)-self.file}", font=self.M_font, font_size=20, color=(255,0,0)))
+                threading.Thread(target=self.process_image, args=(self.files[self.file].name,)).start()
+            else:
+                self.files = []
+                self.file = 0
+                self.file_name_label.configure(image=self.transparent(0,0, widget=self.file_name_label, text_func=True, text="FILE NAME", font=self.M_font, font_size=30, bg_color=(23, 23, 23)))
+                self.counter_label2.configure(image=self.transparent(630, 90, text_func=True, text=f"{len(self.files)}", font=self.M_font, font_size=20, color=(255,0,0)))
+                self.image_label.configure(image=self.placeholder_image)
 
     def process_image(self, file):
         image = Image.open(file)
         image.resize((287,287))
         self.image_label.configure(image=ctk.CTkImage(image,size=(self.image_label.winfo_width(),self.image_label.winfo_width())))
+        self.analyzing = True
 
 # Run application
 if __name__ == "__main__":
     # create app
     app = App()
-
-    # # on resize
-    # def resize(event):
-    #     app.title_label.configure(font=("Arial", app.winfo_height() * 0.03))
-    #     app.file_counter_label.configure(font=("Arial", app.winfo_height() * 0.03))
-    #     app.ai_label.configure(font=("Arial", app.winfo_height() * 0.05))
-    #     app.upload_btn.grid(ipady=app.winfo_height() * 0.05)
-
-    # app.bind('<Configure>', resize)
 
     # Run application
     app.mainloop()

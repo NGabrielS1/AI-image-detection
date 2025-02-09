@@ -21,7 +21,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 class CreateDataset(Dataset):
     def __init__(self,imageFolderDataset):
         self.imageFolderDataset = imageFolderDataset
-        # data transformation and augmentation    
+        # data transformation   
         self.transform = transforms.Compose([
             transforms.Resize((100,100)),
             transforms.ToTensor()

@@ -16,6 +16,30 @@ ctk.set_appearance_mode("dark")
 
 # find device
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# load dataset
+class CreateDataset(Dataset):
+    def __init__(self,imageFolderDataset):
+        self.imageFolderDataset = imageFolderDataset
+        # data transformation and augmentation    
+        self.transform = transforms.Compose([
+            transforms.Resize((100,100)),
+            transforms.ToTensor()
+        ])
+        
+    def __getitem__(self,index):
+        img_tuple = self.imageFolderDataset.imgs[index]
+
+        img = Image.open(img_tuple[0])
+        img = img.convert("L")
+        img = self.transform(img)
+       
+        return img, img_tuple[1]
+    
+    # len function
+    def __len__(self):
+        return len(self.imageFolderDataset.imgs)
+    
+dataset = CreateDataset(datasets.ImageFolder(root="./app_data/"))
 
 # Model Class
 class SiameseNetwork(nn.Module):

@@ -70,6 +70,8 @@ class App(ctk.CTk):
     height = 600
     analyzing = False
     model = SiameseNetwork().to(device)
+    model.load_state_dict(torch.load(("AI_DETECTOR_SIAMESE.pt"),map_location=torch.device('cpu')))
+    app_data = DataLoader(dataset, shuffle=False, batch_size=1)
 
     def __init__(self):
         super().__init__()

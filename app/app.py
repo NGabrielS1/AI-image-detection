@@ -16,7 +16,8 @@ ctk.set_appearance_mode("dark")
 
 # find device
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-# load dataset
+
+# load dataset class
 class CreateDataset(Dataset):
     def __init__(self,imageFolderDataset):
         self.imageFolderDataset = imageFolderDataset
@@ -38,8 +39,6 @@ class CreateDataset(Dataset):
     # len function
     def __len__(self):
         return len(self.imageFolderDataset.imgs)
-    
-dataset = CreateDataset(datasets.ImageFolder(root="./app_data/"))
 
 # Model Class
 class SiameseNetwork(nn.Module):
@@ -71,7 +70,6 @@ class App(ctk.CTk):
     analyzing = False
     model = SiameseNetwork().to(device)
     model.load_state_dict(torch.load(("AI_DETECTOR_SIAMESE.pt"),map_location=torch.device('cpu')))
-    app_data = DataLoader(dataset, shuffle=False, batch_size=1)
 
     def __init__(self):
         super().__init__()
@@ -82,8 +80,11 @@ class App(ctk.CTk):
         self.resizable(0, 0)
 
         # widgets
-        # images
         current_path = os.path.dirname(os.path.realpath(__file__))
+        #dataset
+        dataset = CreateDataset(datasets.ImageFolder(root=current_path+"/app_data/"))
+        self.app_data = DataLoader(dataset, shuffle=False, batch_size=1)
+        # images
         self.upload_img = ctk.CTkImage(Image.open(current_path+"/upload-button.png"), size=(300, 75))
         self.bg_image_pil = Image.open(current_path+"/background.png")
         self.bg_img = ctk.CTkImage(self.bg_image_pil,size=(self.width, self.height))

@@ -218,6 +218,7 @@ class App(ctk.CTk):
                 self.image_label.configure(image=self.placeholder_image)
 
     def process_image(self, file):
+        status = None
         image = Image.open(file)
         image.resize((287,287))
         self.image_label.configure(image=ctk.CTkImage(image,size=(self.image_label.winfo_width(),self.image_label.winfo_width())))

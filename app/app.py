@@ -105,7 +105,7 @@ class App(ctk.CTk):
 
         # title page
         self.welcome_label = ctk.CTkLabel(master=self)
-        self.welcome_label.configure(image=self.transparent(55, 90, widget=self.welcome_label, text_func=True, text="WELCOME TO", font=self.M_font, height=28))
+        self.welcome_label.configure(image=self.transparent(55, 90, widget=self.welcome_label, text_func=True, text="WELCOME TO", font=self.M_font))
         self.welcome_label.place(x=55,y=90)
 
         self.title_label = ctk.CTkLabel(master=self)

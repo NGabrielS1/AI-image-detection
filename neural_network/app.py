@@ -2,11 +2,7 @@ import customtkinter as ctk
 from customtkinter import filedialog
 from PIL import Image, ImageFont, ImageDraw
 import threading
-import sys
 import os
-import shutil
-from typing import Union
-import numpy as np
 
 ctk.set_appearance_mode("dark")
 
@@ -39,7 +35,6 @@ class App(ctk.CTk):
         next_img = Image.alpha_composite(next_img, Image.open(current_path+"/next.png").convert("RGBA"))
         self.next_img = ctk.CTkImage(next_img, size=(200,60))
 
-
         # fonts
         self.LS_font = current_path+"/LeagueSpartan-Bold.ttf"
         self.M_font = current_path+"/Montserrat-Medium.ttf"
@@ -57,46 +52,33 @@ class App(ctk.CTk):
         self.title_label.configure(image=self.transparent(55, 122, widget=self.title_label, text_func=True, text="AI IMAGE \nDETECTOR", font=self.LS_font, font_size=98))
         self.title_label.place(x=55,y=122)
 
-        self.start_btn = ctk.CTkButton(master=self, width=200, height=50, text="", corner_radius=50, fg_color="#0fb568", hover=False, bg_color="black", text_color="black", font=("Free Sans", 20), 
+        self.start_btn = ctk.CTkButton(master=self, width=200, height=50, text="", corner_radius=50, fg_color="#0fb568", hover=False, bg_color="black", command=self.next_page, 
             image=self.transparent(55, 450, text_func=True, text="START NOW", font=self.M_font, font_size=17, bg_color=(15, 181, 104),pad=(17,0), color=(0,0,0)))
         self.start_btn.place(x=55,y=450)
 
-        self.welcome_label.destroy()
-        self.title_label.destroy()
-        self.start_btn.destroy()
-
         # ai page
-        self.bg_image_label.configure(image=self.page_img)
         self.footer = ctk.CTkFrame(self, width=self.width, height=75, fg_color="#171717")
-        self.footer.place(x=0, y=self.height-75)
         self.footer.pack_propagate(False)
         self.footer.columnconfigure((0,1), weight=1, uniform=True)
         self.footer.rowconfigure(0, weight=1)
 
         self.upload_btn = ctk.CTkButton(self.footer, height=75, width=350, image=self.upload_img, text="", fg_color="#171717", corner_radius=0, anchor="center", command=self.get_images)
-        self.upload_btn.pack(side="left", fill="both")
 
         self.file_name_label = ctk.CTkLabel(self.footer, height=75, text="", fg_color="transparent", corner_radius=0)
         self.file_name_label.configure(image=self.transparent(0,0, widget=self.file_name_label, text_func=True, text="FILE NAME", font=self.M_font, font_size=30, bg_color=(23, 23, 23)))
-        self.file_name_label.pack(side="right", fill="both")
 
         self.image_label = ctk.CTkLabel(self, height=287, width=287, text="", image=self.placeholder_image)
-        self.image_label.place(x=260,y=135)
 
-        self.next_btn = ctk.CTkButton(self, height=60, width=200, image=self.next_img, text="", border_width=0, fg_color="transparent", corner_radius=0, command=self.next_file)
-        self.next_btn.place(x=300,y=450)
+        self.next_btn = ctk.CTkLabel(self, height=60, width=200, image=self.next_img, text="", fg_color="transparent", corner_radius=0)
 
         self.title_label2 = ctk.CTkLabel(master=self)
         self.title_label2.configure(image=self.transparent(120, 60, widget=self.title_label2, text_func=True, text="AI IMAGE \nDETECTOR", font=self.LS_font, font_size=25))
-        self.title_label2.place(x=120,y=60)
 
         self.counter_label1 = ctk.CTkLabel(self, text="", height=25,
-            image=self.transparent(450, 90, text_func=True, text="FILE DETECTED: ", font=self.M_font, font_size=20))
-        self.counter_label1.place(x=450, y=90)
+            image=self.transparent(450, 90, text_func=True, text="FILES DETECTED: ", font=self.M_font, font_size=20))
 
         self.counter_label2 = ctk.CTkLabel(self, text="", height=25,
-            image=self.transparent(630, 90, text_func=True, text="0", font=self.M_font, font_size=20, color=(255,0,0)))
-        self.counter_label2.place(x=630, y=90)
+            image=self.transparent(640, 90, text_func=True, text="0", font=self.M_font, font_size=20, color=(255,0,0)))
 
     # helper functions
     def transparent(self, x, y, widget=None, text_func=False, text=None, font=None, color=None, font_size=None, width=None, height=None, bg_color=None, pad=None, anchor=None):
@@ -147,6 +129,7 @@ class App(ctk.CTk):
         image = ctk.CTkImage(image, size=(width,height))
         return image
 
+    # image functions
     def get_images(self):
         self.file = 0
         self.files = filedialog.askopenfiles(filetypes=[("Image Files", "*.jpg *.jpeg *.pgm")])
@@ -157,7 +140,7 @@ class App(ctk.CTk):
         self.counter_label2.configure(image=self.transparent(630, 90, text_func=True, text=f"{len(self.files)}", font=self.M_font, font_size=20, color=(255,0,0)))
         threading.Thread(target=self.process_image, args=(self.files[self.file].name,)).start()
 
-    def next_file(self):
+    def next_file(self, event=None):
         if not self.analyzing:
             if self.file < len(self.files)-1:
                 self.file += 1
@@ -179,11 +162,31 @@ class App(ctk.CTk):
         image.resize((287,287))
         self.image_label.configure(image=ctk.CTkImage(image,size=(self.image_label.winfo_width(),self.image_label.winfo_width())))
         self.analyzing = True
+        self.analyzing = False
+
+    def next_page(self):
+        self.bg_image_label.configure(image=self.page_img)
+
+        self.welcome_label.destroy()
+        self.title_label.destroy()
+        self.start_btn.destroy()
+
+        self.footer.place(x=0, y=self.height-75)
+        self.upload_btn.pack(side="left", fill="both")
+        self.file_name_label.pack(side="right", fill="both")
+        self.image_label.place(x=260,y=135)
+        self.next_btn.place(x=300,y=450)
+        self.title_label2.place(x=120,y=60)
+        self.counter_label1.place(x=450, y=90)
+        self.counter_label2.place(x=640, y=90)
 
 # Run application
 if __name__ == "__main__":
     # create app
     app = App()
+
+    # custom button
+    app.next_btn.bind("<ButtonPress-1>", app.next_file)
 
     # Run application
     app.mainloop()

@@ -31,7 +31,6 @@ class CreateDataset(Dataset):
         img_tuple = self.imageFolderDataset.imgs[index]
 
         img = Image.open(img_tuple[0])
-        img = img.convert("L")
         img = self.transform(img)
        
         return img, img_tuple[1]
@@ -46,7 +45,6 @@ class SiameseNetwork(nn.Module):
         super().__init__()
         # load ResNet34(transfer learning)
         self.resnet34 = models.resnet34(weights=ResNet34_Weights.DEFAULT)
-        self.resnet34.conv1 = nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
         self.resnet34.fc = nn.Linear(in_features=512, out_features=2, bias=True)
     
     def forward_once(self, X):
@@ -69,7 +67,7 @@ class App(ctk.CTk):
     height = 600
     analyzing = False
     model = SiameseNetwork().to(device)
-    model.load_state_dict(torch.load(("AI_DETECTOR_SIAMESE.pt"),map_location=torch.device('cpu')))
+    model.load_state_dict(torch.load(("AI_DETECTOR_SIAMESE1.pt"),map_location=torch.device('cpu')))
     transform = transforms.Compose([
             transforms.Resize((100,100)),
             transforms.ToTensor()
@@ -230,8 +228,7 @@ class App(ctk.CTk):
         self.analyzing = True
 
         # prepare image
-        X0 = image.convert("L")
-        X0 = self.transform(X0)
+        X0 = self.transform(image)
         X0 = X0.unsqueeze(0)
 
         # get predictions

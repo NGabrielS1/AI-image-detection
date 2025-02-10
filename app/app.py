@@ -70,6 +70,10 @@ class App(ctk.CTk):
     analyzing = False
     model = SiameseNetwork().to(device)
     model.load_state_dict(torch.load(("AI_DETECTOR_SIAMESE.pt"),map_location=torch.device('cpu')))
+    transform = transforms.Compose([
+            transforms.Resize((100,100)),
+            transforms.ToTensor()
+    ])
 
     def __init__(self):
         super().__init__()
@@ -191,14 +195,15 @@ class App(ctk.CTk):
 
     # image functions
     def get_images(self):
-        self.file = 0
-        self.files = filedialog.askopenfiles(filetypes=[("Image Files", "*.jpg *.jpeg *.pgm")])
-        print(self.files[0])
-        filename = self.files[self.file].name.split("/")[-1]
-        self.file_name_label.configure(image=self.transparent(0,0, widget=self.file_name_label, text_func=True, text=f"{filename}", \
-            font=self.M_font, font_size=30, bg_color=(23, 23, 23)))
-        self.counter_label2.configure(image=self.transparent(630, 90, text_func=True, text=f"{len(self.files)}", font=self.M_font, font_size=20, color=(255,0,0)))
-        threading.Thread(target=self.process_image, args=(self.files[self.file].name,)).start()
+        if not self.analyzing:
+            self.file = 0
+            self.files = filedialog.askopenfiles(filetypes=[("Image Files", "*.jpg *.jpeg *.pgm")])
+            print(self.files[0])
+            filename = self.files[self.file].name.split("/")[-1]
+            self.file_name_label.configure(image=self.transparent(0,0, widget=self.file_name_label, text_func=True, text=f"{filename}", \
+                font=self.M_font, font_size=30, bg_color=(23, 23, 23)))
+            self.counter_label2.configure(image=self.transparent(630, 90, text_func=True, text=f"{len(self.files)}", font=self.M_font, font_size=20, color=(255,0,0)))
+            threading.Thread(target=self.process_image, args=(self.files[self.file].name,)).start()
 
     def next_file(self, event=None):
         if not self.analyzing:
@@ -218,16 +223,31 @@ class App(ctk.CTk):
                 self.image_label.configure(image=self.placeholder_image)
 
     def process_image(self, file):
-        status = None
+        status = ""
         image = Image.open(file)
         image.resize((287,287))
         self.image_label.configure(image=ctk.CTkImage(image,size=(self.image_label.winfo_width(),self.image_label.winfo_width())))
         self.analyzing = True
 
+        # prepare image
+        X0 = image.convert("L")
+        X0 = self.transform(X0)
+        X0 = X0.unsqueeze(0)
+
         # get predictions
         self.model.eval()
         with torch.no_grad():
-            pass
+            for X1, img_class in self.app_data:
+                X0, X1 = X0.to(device), X1.to(device)
+                output1, output2 = self.model(X0, X1)
+                euclidean_distance = F.pairwise_distance(output1, output2)
+                print(euclidean_distance)
+                if euclidean_distance.item() < 1:
+                    status = "AI"
+                    break
+                else:
+                    status = "REAL"
+        print(status)
         
         self.analyzing = False
 

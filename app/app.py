@@ -67,7 +67,7 @@ class App(ctk.CTk):
     height = 600
     analyzing = False
     model = SiameseNetwork().to(device)
-    model.load_state_dict(torch.load(("AI_DETECTOR_SIAMESE1.pt"),map_location=torch.device('cpu')))
+    model.load_state_dict(torch.load(("AI_DETECTOR_SIAMESE.pt"),map_location=torch.device('cpu')))
     transform = transforms.Compose([
             transforms.Resize((100,100)),
             transforms.ToTensor()

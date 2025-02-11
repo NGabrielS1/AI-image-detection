@@ -126,8 +126,8 @@ class App(ctk.CTk):
 
         self.upload_btn = ctk.CTkButton(self.footer, height=75, width=350, image=self.upload_img, text="", fg_color="#171717", corner_radius=0, anchor="center", command=self.get_images)
 
-        self.file_name_label = ctk.CTkLabel(self.footer, height=75, text="", fg_color="transparent", corner_radius=0)
-        self.file_name_label.configure(image=self.transparent(0,0, widget=self.file_name_label, text_func=True, text="FILE NAME", font=self.M_font, font_size=30, bg_color=(23, 23, 23)))
+        self.status_label1 = ctk.CTkLabel(self.footer, height=75, text="", fg_color="transparent", corner_radius=0)
+        self.status_label1.configure(image=self.transparent(0,0, text_func=True, text="STATUS", font=self.M_font, font_size=30, bg_color=(23, 23, 23), height=100))
 
         self.image_label = ctk.CTkLabel(self, height=287, width=287, text="", image=self.placeholder_image)
 
@@ -159,11 +159,8 @@ class App(ctk.CTk):
         # draw text
         if text_func:
             width = len(text)*font_size
-            try:
-                if widget == self.file_name_label and width > 400:
-                    width = 400
-            except: pass
-            height = font_size+5
+            if height == None:
+                height = font_size+5
             fill = color
             text = text
             font = font
@@ -197,9 +194,7 @@ class App(ctk.CTk):
             self.file = 0
             self.files = filedialog.askopenfiles(filetypes=[("Image Files", "*.jpg *.jpeg *.pgm")])
             print(self.files[0])
-            filename = self.files[self.file].name.split("/")[-1]
-            self.file_name_label.configure(image=self.transparent(0,0, widget=self.file_name_label, text_func=True, text=f"{filename}", \
-                font=self.M_font, font_size=30, bg_color=(23, 23, 23)))
+            self.status_label1.configure(image=self.transparent(0,0, text_func=True, text="...", color=(0,0,255), font=self.M_font, font_size=30, bg_color=(23, 23, 23)))
             self.counter_label2.configure(image=self.transparent(630, 90, text_func=True, text=f"{len(self.files)}", font=self.M_font, font_size=20, color=(255,0,0)))
             threading.Thread(target=self.process_image, args=(self.files[self.file].name,)).start()
 
@@ -207,18 +202,15 @@ class App(ctk.CTk):
         if not self.analyzing:
             if self.file < len(self.files)-1:
                 self.file += 1
-                filename = self.files[self.file].name.split("/")[-1]
-                self.file_name_label.configure(image=self.transparent(0,0, widget=self.file_name_label, text_func=True, text=f"{filename}", \
-                    font=self.M_font, font_size=30, bg_color=(23, 23, 23)))
-                # self.ai_label.configure(text="...", text_color="blue")
+                self.status_label1.configure(image=self.transparent(0,0, text_func=True, text="...", color=(0,0,255), font=self.M_font, font_size=30, bg_color=(23, 23, 23)))
                 self.counter_label2.configure(image=self.transparent(630, 90, text_func=True, text=f"{len(self.files)-self.file}", font=self.M_font, font_size=20, color=(255,0,0)))
                 threading.Thread(target=self.process_image, args=(self.files[self.file].name,)).start()
             else:
                 self.files = []
                 self.file = 0
-                self.file_name_label.configure(image=self.transparent(0,0, widget=self.file_name_label, text_func=True, text="FILE NAME", font=self.M_font, font_size=30, bg_color=(23, 23, 23)))
                 self.counter_label2.configure(image=self.transparent(630, 90, text_func=True, text=f"{len(self.files)}", font=self.M_font, font_size=20, color=(255,0,0)))
                 self.image_label.configure(image=self.placeholder_image)
+                self.status_label1.configure(image=self.transparent(0,0, text_func=True, text="STATUS", font=self.M_font, font_size=30, bg_color=(23, 23, 23)))
 
     def process_image(self, file):
         status = ""
@@ -238,12 +230,16 @@ class App(ctk.CTk):
                 X0, X1 = X0.to(device), X1.to(device)
                 output1, output2 = self.model(X0, X1)
                 euclidean_distance = F.pairwise_distance(output1, output2)
-                print(euclidean_distance)
-                if euclidean_distance.item() < 1:
+                print(euclidean_distance.item())
+                if euclidean_distance.item() < 0.3:
                     status = "AI"
                     break
                 else:
                     status = "REAL"
+        if status == "AI":
+            self.status_label1.configure(image=self.transparent(0,0, text_func=True, text="AI", color=(0,255,0), font=self.M_font, font_size=30, bg_color=(23, 23, 23)))
+        else:
+            self.status_label1.configure(image=self.transparent(0,0, text_func=True, text="HUMAN", color=(255,0,0), font=self.M_font, font_size=30, bg_color=(23, 23, 23)))
         print(status)
         
         self.analyzing = False
@@ -257,7 +253,7 @@ class App(ctk.CTk):
 
         self.footer.place(x=0, y=self.height-75)
         self.upload_btn.pack(side="left", fill="both")
-        self.file_name_label.pack(side="right", fill="both")
+        self.status_label1.pack(side="right", fill="both")
         self.image_label.place(x=260,y=135)
         self.next_btn.place(x=300,y=450)
         self.title_label2.place(x=120,y=60)

@@ -108,7 +108,7 @@ def imshow(img, text=None):
     plt.show()    
 
 model = SiameseNetwork().to(device)
-model.load_state_dict(torch.load(("AI_DETECTOR_SIAMESE.pt"),map_location=torch.device('cpu')))
+model.load_state_dict(torch.load(("neural_network/AI_DETECTOR_SIAMESE.pt"),map_location=torch.device('cpu')))
 
 if __name__ == "__main__":
     # load datasets

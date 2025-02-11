@@ -174,4 +174,4 @@ if __name__ == "__main__":
     plt.show()
 
     # save our NN model
-    torch.save(model.state_dict(), "AI_DETECTOR_SIAMESE.pt")
+    torch.save(model.state_dict(), "neural_network/AI_DETECTOR_SIAMESE.pt")

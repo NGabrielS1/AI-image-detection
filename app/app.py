@@ -84,7 +84,7 @@ class App(ctk.CTk):
         # widgets
         current_path = os.path.dirname(os.path.realpath(__file__))
         #dataset
-        dataset = CreateDataset(datasets.ImageFolder(root=current_path+"/app_data/"))
+        dataset = CreateDataset(datasets.ImageFolder(root=current_path+"/app_data1/"))
         self.app_data = DataLoader(dataset, shuffle=False, batch_size=1)
         # images
         self.upload_img = ctk.CTkImage(Image.open(current_path+"/upload-button.png"), size=(300, 75))
@@ -127,7 +127,7 @@ class App(ctk.CTk):
         self.upload_btn = ctk.CTkButton(self.footer, height=75, width=350, image=self.upload_img, text="", fg_color="#171717", corner_radius=0, anchor="center", command=self.get_images)
 
         self.status_label1 = ctk.CTkLabel(self.footer, height=75, text="", fg_color="transparent", corner_radius=0)
-        self.status_label1.configure(image=self.transparent(0,0, text_func=True, text="STATUS", font=self.M_font, font_size=30, bg_color=(23, 23, 23), height=100))
+        self.status_label1.configure(image=self.transparent(0,0, text_func=True, text="STATUS", font=self.M_font, font_size=30, bg_color=(23, 23, 23)))
 
         self.image_label = ctk.CTkLabel(self, height=287, width=287, text="", image=self.placeholder_image)
 
@@ -194,7 +194,7 @@ class App(ctk.CTk):
             self.file = 0
             self.files = filedialog.askopenfiles(filetypes=[("Image Files", "*.jpg *.jpeg *.pgm")])
             print(self.files[0])
-            self.status_label1.configure(image=self.transparent(0,0, text_func=True, text="...", color=(0,0,255), font=self.M_font, font_size=30, bg_color=(23, 23, 23)))
+            self.status_label1.configure(image=self.transparent(0,0, text_func=True, text="...", color=(0,0,255), font=self.M_font, font_size=30, bg_color=(23, 23, 23), height=10))
             self.counter_label2.configure(image=self.transparent(630, 90, text_func=True, text=f"{len(self.files)}", font=self.M_font, font_size=20, color=(255,0,0)))
             threading.Thread(target=self.process_image, args=(self.files[self.file].name,)).start()
 
@@ -202,7 +202,7 @@ class App(ctk.CTk):
         if not self.analyzing:
             if self.file < len(self.files)-1:
                 self.file += 1
-                self.status_label1.configure(image=self.transparent(0,0, text_func=True, text="...", color=(0,0,255), font=self.M_font, font_size=30, bg_color=(23, 23, 23)))
+                self.status_label1.configure(image=self.transparent(0,0, text_func=True, text="...", color=(0,0,255), font=self.M_font, font_size=30, bg_color=(23, 23, 23), height=10))
                 self.counter_label2.configure(image=self.transparent(630, 90, text_func=True, text=f"{len(self.files)-self.file}", font=self.M_font, font_size=20, color=(255,0,0)))
                 threading.Thread(target=self.process_image, args=(self.files[self.file].name,)).start()
             else:
@@ -231,7 +231,7 @@ class App(ctk.CTk):
                 output1, output2 = self.model(X0, X1)
                 euclidean_distance = F.pairwise_distance(output1, output2)
                 print(euclidean_distance.item())
-                if euclidean_distance.item() < 0.3:
+                if euclidean_distance.item() < 1:
                     status = "AI"
                     break
                 else:

@@ -193,7 +193,7 @@ class App(ctk.CTk):
         if not self.analyzing:
             self.file = 0
             self.files = filedialog.askopenfiles(filetypes=[("Image Files", "*.jpg *.jpeg *.pgm")])
-            print(self.files[0])
+            # print(self.files[0])
             self.status_label1.configure(image=self.transparent(0,0, text_func=True, text="...", color=(224, 255, 255), font=self.M_font, font_size=30, bg_color=(23, 23, 23), height=10))
             self.counter_label2.configure(image=self.transparent(630, 90, text_func=True, text=f"{len(self.files)}", font=self.M_font, font_size=20, color=(255,0,0)))
             threading.Thread(target=self.process_image, args=(self.files[self.file].name,)).start()
@@ -230,7 +230,7 @@ class App(ctk.CTk):
                 X0, X1 = X0.to(device), X1.to(device)
                 output1, output2 = self.model(X0, X1)
                 euclidean_distance = F.pairwise_distance(output1, output2)
-                print(euclidean_distance.item())
+                # print(euclidean_distance.item())
                 if euclidean_distance.item() < 1:
                     status = "AI"
                     break
@@ -240,7 +240,7 @@ class App(ctk.CTk):
             self.status_label1.configure(image=self.transparent(0,0, text_func=True, text="AI", color=(255,0,0), font=self.M_font, font_size=30, bg_color=(23, 23, 23)))
         else:
             self.status_label1.configure(image=self.transparent(0,0, text_func=True, text="HUMAN", color=(0,255,0), font=self.M_font, font_size=30, bg_color=(23, 23, 23)))
-        print(status)
+        # print(status)
         
         self.analyzing = False
 

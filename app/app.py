@@ -84,7 +84,7 @@ class App(ctk.CTk):
         # widgets
         current_path = os.path.dirname(os.path.realpath(__file__))
         #dataset
-        dataset = CreateDataset(datasets.ImageFolder(root=current_path+"/app_data1/"))
+        dataset = CreateDataset(datasets.ImageFolder(root=current_path+"/app_data/"))
         self.app_data = DataLoader(dataset, shuffle=False, batch_size=1)
         # images
         self.upload_img = ctk.CTkImage(Image.open(current_path+"/upload-button.png"), size=(300, 75))

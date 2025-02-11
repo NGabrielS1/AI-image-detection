@@ -195,7 +195,7 @@ class App(ctk.CTk):
             self.files = filedialog.askopenfiles(filetypes=[("Image Files", "*.jpg *.jpeg *.pgm")])
             # print(self.files[0])
             self.status_label1.configure(image=self.transparent(0,0, text_func=True, text="...", color=(224, 255, 255), font=self.M_font, font_size=30, bg_color=(23, 23, 23), height=10))
-            self.counter_label2.configure(image=self.transparent(630, 90, text_func=True, text=f"{len(self.files)}", font=self.M_font, font_size=20, color=(255,0,0)))
+            self.counter_label2.configure(image=self.transparent(630, 90, text_func=True, text=f"{len(self.files)}", font=self.M_font, font_size=20, color=(0,255,0)))
             threading.Thread(target=self.process_image, args=(self.files[self.file].name,)).start()
 
     def next_file(self, event=None):
@@ -203,7 +203,7 @@ class App(ctk.CTk):
             if self.file < len(self.files)-1:
                 self.file += 1
                 self.status_label1.configure(image=self.transparent(0,0, text_func=True, text="...", color=(224, 255, 255), font=self.M_font, font_size=30, bg_color=(23, 23, 23), height=10))
-                self.counter_label2.configure(image=self.transparent(630, 90, text_func=True, text=f"{len(self.files)-self.file}", font=self.M_font, font_size=20, color=(255,0,0)))
+                self.counter_label2.configure(image=self.transparent(630, 90, text_func=True, text=f"{len(self.files)-self.file}", font=self.M_font, font_size=20, color=(0,255,0)))
                 threading.Thread(target=self.process_image, args=(self.files[self.file].name,)).start()
             else:
                 self.files = []
